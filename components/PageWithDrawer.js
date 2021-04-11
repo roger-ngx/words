@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react';
+import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -17,12 +17,14 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
 
-import { map } from 'lodash';
+import { map, size } from 'lodash';
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { setFiles, setSelectedType, setSelectedFileName } from 'stores/fileSlice';
+
 
 const drawerWidth = 240;
 
@@ -72,10 +74,30 @@ function PageWithDrawer({window, type, files, children}) {
   const annotationFiles = useSelector(state => state.files.annotation);
   const classificationFiles = useSelector(state => state.files.classification);
 
-  const router = useRouter();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    getAnnotationFiles();
+  }, []);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const getAnnotationFiles = () => {
+    const data = {
+      type: 'annotation'
+    };
+
+    fetch('/api/file/file_list', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(files => dispatch(setFiles({type: 'annotation', files})));
   };
 
   const drawer = (
@@ -83,55 +105,70 @@ function PageWithDrawer({window, type, files, children}) {
       <div className={classes.toolbar} />
       <Divider />
       <List>
-          <ListItem button>
-            <Link href='/products/annotation'>
-              <ListItemText button primary='Annotation' />
-            </Link>
-            <IconButton
+          <Link href='/products/annotation'>
+            <ListItem
+              button
               onClick={
                 () => {
                   setOpenAnnotation(!openAnnotation);
+                  dispatch(setSelectedType('annotation'));
                 }
               }
             >
-              {openAnnotation ? <ExpandLess /> : <ExpandMore />}
-            </IconButton>
-          </ListItem>
+                <ListItemText button primary='Annotation' />
+                {size(annotationFiles) && (openAnnotation ? <ExpandLess /> : <ExpandMore />)}
+            </ListItem>
+          </Link>
           <Collapse in={openAnnotation} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
               {
                 map(annotationFiles, file => (
-                  <ListItem button className={classes.nested} key={file}>
+                <Link href='/products/annotation'>
+                  <ListItem
+                    button
+                    className={classes.nested}
+                    key={file}
+                    onClick={() => {
+                      dispatch(setSelectedType('annotation'));
+                      dispatch(setSelectedFileName(file));
+                    }}
+                  >
                     <ListItemText primary={file} />
                   </ListItem>
+                </Link>
                 ))
               }
             </List>
           </Collapse>
 
-
-          <ListItem
-            button
-          >
-            <Link href='/products/classification'>
-              <ListItemText primary='Classification' />
-            </Link>
-            <IconButton
+          <Link href='/products/classification'>
+            <ListItem
+              button
               onClick={
                 () => {
                   setOpenClassification(!openClassification);
+                  dispatch(setSelectedType('classification'));
                 }
               }
             >
-              {openClassification ? <ExpandLess /> : <ExpandMore />}
-            </IconButton>
-          </ListItem>
+              <ListItemText primary='Classification' />
+              {size(classificationFiles) > 0 && (openClassification ? <ExpandLess /> : <ExpandMore />)}
+            </ListItem>
+          </Link>
 
           <Collapse in={openClassification} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
               {
                 map(classificationFiles, file => (
-                  <ListItem button className={classes.nested} key={file}>
+                  <ListItem
+                    button
+                    className={classes.nested}
+                    key={file}
+                    onClick={() => {
+                      dispatch(setSelectedType('classification'));
+                      dispatch(setSelectedFileName(file));
+                    }}
+                  >
                     <ListItemText primary={file} />
                   </ListItem>
                 ))
