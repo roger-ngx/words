@@ -1,6 +1,19 @@
+
+import { useEffect } from 'react';
 import Head from 'next/head'
 
 export default function Home() {
+
+  useEffect(() => {
+    fetch('/api/user/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({username: 'thanh'})
+    }).then(res => console.log(res));
+  }, []);
+
   return (
     <div className="container">
       <Head>
