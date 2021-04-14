@@ -8,7 +8,6 @@ import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import PageWithDrawer from 'components/PageWithDrawer';
 
 import { useDispatch } from 'react-redux';
 import { setFiles } from 'stores/fileSlice';

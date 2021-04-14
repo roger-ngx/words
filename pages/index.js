@@ -1,26 +1,57 @@
+import { useState } from 'react';
+import { Button, FormControl, Input, InputAdornment, InputLabel, Paper } from '@material-ui/core'
+import { AccountCircle } from '@material-ui/icons'
 import Head from 'next/head'
+import { useRouter } from 'next/router';
 
 export default function Home() {
+
+  const [ username, setUsername ] = useState('');
+  const router = useRouter();
+
+  const onLogin = () => {
+    localStorage.setItem('currentUser', username);
+    router.push('/products/annotation');
+  }
+
   return (
     <div className="container">
       <Head>
-        <title>Create Next App</title>
+        <title>Login</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main>
-        
+        <div>
+          <Paper style={{padding: 24}}>
+            <div style={{display: 'flex', flexDirection: 'column'}}>
+              <FormControl>
+                <InputLabel>Type your nickname</InputLabel>
+                <Input
+                  value={username}
+                  onChange={e => setUsername(e.target.value)}
+                  startAdornment={
+                    <InputAdornment position='start'>
+                      <AccountCircle />
+                    </InputAdornment>
+                  }
+                />
+              </FormControl>
+              <Button
+                style={{marginTop: 24}}
+                variant='contained'
+                color='primary'
+                onClick={onLogin}
+              >
+                Login
+              </Button>
+            </div>
+          </Paper>
+        </div>
       </main>
 
       <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
-        </a>
+        Powered by Words
       </footer>
 
       <style jsx>{`
