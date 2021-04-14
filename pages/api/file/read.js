@@ -7,11 +7,15 @@ export default function handler(req, res){
 
     const { type, name } = req.body;
 
-    fs.readFileSync(`${directoryPath}/${type}/${name}`, (err, file) => {
-        if(err){
+    console.log(`${directoryPath}/${type}/${name}`);
 
-        }
+    try{
+        const file = fs.readFileSync(`${directoryPath}/${type}/${name}`);
+
+        console.log(file.toString());
 
         res.json(file);
-    });
-};
+    }catch(err){
+        console.log(err);
+    }
+}

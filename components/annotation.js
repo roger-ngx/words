@@ -9,8 +9,8 @@ import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 
-import { useDispatch } from 'react-redux';
-import { setFiles } from 'stores/fileSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { addFile } from 'stores/fileSlice';
 
 const AddNewAnnotationDialog = ({open, setOpen, onAddNewAnnotation}) => {
     const [ verified, setVerified ] = useState(false);
@@ -57,6 +57,41 @@ const AddNewAnnotationDialog = ({open, setOpen, onAddNewAnnotation}) => {
     )
 }
 
+const FilenameInputDialog = ({open, setOpen, onFinish}) => {
+    const [ fileName, setFileName ] = useState('');
+
+    const onFileNameChange = e => setFileName(e.target.value);
+
+    return (
+        <Dialog open={open} onClose={() => setOpen(false)}>
+            <DialogTitle>
+                Add a new annotation
+            </DialogTitle>
+            <DialogContent>
+                <div style={{display: 'flex', flexDirection: 'column'}}>
+                    <TextField
+                        label='file name'
+                        required
+                        onChange={onFileNameChange}
+                        value={fileName}
+                    />
+                </div>
+            </DialogContent>
+            <DialogActions>
+                <Button variant='outlined' onClick={() => setOpen(false)}>Cancel</Button>
+                <Button
+                    disabled={isEmpty(fileName)}
+                    color='primary'
+                    variant='outlined'
+                    onClick={() => onFinish(fileName)}
+                >
+                    Add
+                </Button>
+            </DialogActions>
+        </Dialog>
+    )
+}
+
 const HeaderTag = ({name, index, backgroundColor, color, onClick}) => {
 
     return(<div
@@ -93,8 +128,8 @@ const HeaderTag = ({name, index, backgroundColor, color, onClick}) => {
 let init = true;
 
 const ANNOTATION_TYPES = [
-    // {code: 'PER', type: 'person'},
-    // {code: 'ORG', type: 'org'},
+    {code: 'PER', type: 'person'},
+    {code: 'ORG', type: 'org'},
     // {code: 'EVT', type: 'event'},
     // {code: 'DAT', type: 'data'},
     // {code:'LOC', type: 'location'},
@@ -106,9 +141,7 @@ const ANNOTATION_TYPES = [
 
 const Annotation = () => {
 
-    const dispatch = useDispatch();
-
-    const [ userDefineAnnotations, setUserDefineAnnotations ] = useState([]);
+    const [ userDefineAnnotations, setUserDefineAnnotations ] = useState();
 
     const [texts, setTexts] = useState([]);
     const [annotations, setAnnotations] = useState([]); 
@@ -123,15 +156,62 @@ const Annotation = () => {
 
     const [ markedIndices, setMarkedIndicies ] = useState([]);
 
-    const [ annotationType, setAnnotationType ] = useState('');
+    const [ annotationType, setAnnotationType ] = useState('PER');
 
     const [ openAnnotationInput, setOpenAnnotationInput ] = useState(false);
+    const [ openFileInput, setOpenFileInput ] = useState(false);
 
-    const [ serverFiles, setServerFiles ] = useState([]);
+
+    const [ currentUploadFile, setCurrentUploadFile ] = useState([]);
+
+    const selectedType = useSelector(state => state.files.selectedType);
+    const selectedFileName = useSelector(state => state.files.selectedFileName);
+
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        initData();
+        const userDefineAnnotations = JSON.parse(localStorage.getItem('userDefineAnnotations'));
+        setUserDefineAnnotations(userDefineAnnotations || ANNOTATION_TYPES);
     }, []);
+
+    useEffect(() => {
+        if(isEmpty(selectedFileName) && isEmpty(selectedType)){
+            return;
+        }
+
+        if(selectedType === 'classification'){
+            return;
+        }
+
+        if(isEmpty(selectedFileName)){
+            initData();
+        }else{
+            getAnnotationFile(selectedFileName);
+        }
+    }, [selectedType, selectedFileName]);
+
+    useEffect(() => {
+        if(!isEmpty(userDefineAnnotations)){
+            localStorage.setItem('userDefineAnnotations', JSON.stringify(userDefineAnnotations));
+        }
+    }, [userDefineAnnotations]);
+
+    const getAnnotationFile = (fileName) => {
+        const data = {
+          type: 'annotation',
+          name: fileName
+        };
+    
+        fetch('/api/file/read', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.text())
+        .then(processFileData);
+    };
 
     useEffect(() => {
         if(isEmpty(currentText)) return;
@@ -380,19 +460,6 @@ const Annotation = () => {
 
     const initData = () => {
         fetch('/testset.tsv').then(res => res.text()).then(processFileData)
-
-        const data = {
-            type: 'annotation'
-        };
-
-        fetch('/api/file/file_list', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        }).then(res => res.json())
-        .then(files => dispatch(setFiles({type: 'annotation', files})))
     }
 
     const processFileData = data => {
@@ -430,22 +497,55 @@ const Annotation = () => {
         console.log(e.target.files);
         const file = e.target.files[0];
 
+        setCurrentUploadFile(file);
+        setOpenFileInput(true);
+    }
+
+    const onFinishInputFilename = fileName => {
+        setOpenFileInput(false);
+
         const fileReader = new FileReader();
 
         fileReader.onload = () => {
             processFileData(fileReader.result);
         }
-        fileReader.readAsText(file);
+        fileReader.readAsText(currentUploadFile);
 
         const data = new FormData();
-        data.append('file', file);
+        data.append('file', currentUploadFile);
         data.append('type', 'annotation');
-        data.append('name', 'test.tsv');
+        data.append('name', fileName);
 
         fetch('/api/file/upload', {
             method: 'POST',
             body: data
-        }).then(res => console.log(res))
+        }).then(res => {
+            dispatch(addFile({type: 'annotation', file: fileName}));
+        })
+    }
+
+    const saveEdittedFile = () => {
+        if(isEmpty(selectedFileName)){
+            return;
+        }
+
+        var tsv = '';
+
+        forEach(texts, (text, index) => {
+            tsv += `\n${text}\t${annotations[index]}`;
+        })
+
+        const data = new FormData();
+        data.append('file', new Blob([tsv]));
+        data.append('type', 'annotation');
+        data.append('name', selectedFileName);
+
+        fetch('/api/file/upload', {
+            method: 'POST',
+            body: data
+        }).then(res => {
+            alert('done');
+        })
     }
 
     const saveCurrentText = () => {
@@ -469,6 +569,8 @@ const Annotation = () => {
 
         console.log(text, annotation)
         alert('saved');
+
+        saveEdittedFile();
     }
 
     const resetCurrentText = () => {
@@ -531,10 +633,8 @@ const Annotation = () => {
                 />
             </div>
 
-
-            {/* https://stackoverflow.com/questions/10666032/why-does-span-break-outside-div-when-margin-and-padding-is-applied/10666138 */}
             {
-                size(tags) > 0 ?
+                /* https://stackoverflow.com/questions/10666032/why-does-span-break-outside-div-when-margin-and-padding-is-applied/10666138 */
                 <div
                     style={{
                         padding: 16,
@@ -548,22 +648,6 @@ const Annotation = () => {
                     {
                         map(tags, tag => tag.component)
                     }
-                </div>
-                :
-                <div style={{padding: 24, display: 'flex', justifyContent: 'center'}}>
-                    <input
-                        style={{display: 'none'}}
-                        id='tsv_file_upload'
-                        multiple
-                        type='file'
-                        accept='.tsv'
-                        onChange={fileUploadedHandle}
-                    />
-                    <label htmlFor='tsv_file_upload'>
-                        <Button color='primary' variant='outlined' component='span'>
-                            Upload file
-                        </Button>
-                    </label>
                 </div>
             }
         </Paper>
@@ -598,6 +682,11 @@ const Annotation = () => {
                         <InsertDriveFileIcon />
                     </IconButton>
                 </label>
+                <FilenameInputDialog
+                    open={openFileInput}
+                    setOpen={setOpenFileInput}
+                    onFinish={onFinishInputFilename}
+                />
             </div>
             <IconButton onClick={saveCurrentText}>
                 <CheckIcon style={{color:'green'}}/>

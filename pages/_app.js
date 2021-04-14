@@ -44,12 +44,12 @@ export default function MyApp(props) {
       jssStyles.parentElement.removeChild(jssStyles);
     }
 
-    const currentUser = localStorage.getItem('currentUser');
-    if(isEmpty(currentUser)){
-      router.push('/');
-    }
+    // const currentUser = localStorage.getItem('currentUser');
+    // if(isEmpty(currentUser)){
+    //   router.push('/');
+    // }
 
-    setCurrentUser(currentUser);
+    // setCurrentUser(currentUser);
 
   }, []);
 
@@ -64,7 +64,7 @@ export default function MyApp(props) {
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
           <div style={{display: 'flex', flexDirection: 'row'}}>
-            { !!currentUser && <PageWithDrawer /> }
+            {/* <PageWithDrawer /> */}
             <div style={{flex: 1}}>
               <Component {...pageProps} />
             </div>

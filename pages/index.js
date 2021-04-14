@@ -14,10 +14,20 @@ export default function Home() {
     router.push('/products/annotation');
   }
 
+  useEffect(() => {
+    fetch('/api/user/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({username: 'thanh'})
+    }).then(res => console.log(res));
+  }, []);
+
   return (
     <div className="container">
       <Head>
-        <title>Login</title>
+        <title>Words</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
