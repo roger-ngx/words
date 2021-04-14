@@ -5,7 +5,7 @@ export const filesSlice = createSlice({
     initialState: {
         annotation: [],
         classification: [],
-        selectedType: 'annotaion',
+        selectedType: 'annotation',
         selectedFileName: ''
     },
     reducers: {

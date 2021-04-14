@@ -1,8 +1,12 @@
 
 import { useEffect } from 'react';
 import Head from 'next/head'
+import { Button } from '@material-ui/core';
+import { useRouter } from 'next/router';
 
 export default function Home() {
+
+  const router = useRouter();
 
   useEffect(() => {
     fetch('/api/user/add', {
@@ -23,6 +27,13 @@ export default function Home() {
 
       <main>
         Welcome to Words.
+        <Button
+          variant='contained'
+          color='primary'
+          onClick={() => router.push('/home')}
+        >
+          Login
+        </Button>
       </main>
 
       <style jsx>{`

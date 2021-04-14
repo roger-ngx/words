@@ -51,7 +51,7 @@ export default function MyApp(props) {
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
           <div style={{display: 'flex', flexDirection: 'row'}}>
-            <PageWithDrawer />
+            {/* <PageWithDrawer /> */}
             <div style={{flex: 1}}>
               <Component {...pageProps} />
             </div>

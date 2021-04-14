@@ -8,7 +8,7 @@ import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 import { makeStyles } from '@material-ui/core/styles';
-import PageWithDrawer from '../../components/PageWithDrawer';
+import PageWithDrawer from './PageWithDrawer';
 
 const CLASSIFICATIONS = [
     {
