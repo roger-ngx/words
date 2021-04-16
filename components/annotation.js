@@ -83,7 +83,7 @@ const FilenameInputDialog = ({open, setOpen, onFinish}) => {
                     disabled={isEmpty(fileName)}
                     color='primary'
                     variant='outlined'
-                    onClick={() => onFinish(fileName)}
+                    onClick={() => onFinish(fileName + '.tsv')}
                 >
                     Add
                 </Button>
@@ -166,6 +166,9 @@ const Annotation = () => {
 
     const selectedType = useSelector(state => state.files.selectedType);
     const selectedFileName = useSelector(state => state.files.selectedFileName);
+    const currentUser = useSelector(state => state.user.username);
+
+    console.log('currentUser', currentUser);
 
     const dispatch = useDispatch();
 
@@ -199,7 +202,8 @@ const Annotation = () => {
     const getAnnotationFile = (fileName) => {
         const data = {
           type: 'annotation',
-          fileName
+          fileName,
+          username: currentUser
         };
     
         fetch('/api/file/read', {
@@ -514,7 +518,8 @@ const Annotation = () => {
         const data = new FormData();
         data.append('file', currentUploadFile);
         data.append('type', 'annotation');
-        data.append('name', fileName);
+        data.append('fileName', fileName);
+        data.append('username', currentUser)
 
         fetch('/api/file/upload', {
             method: 'POST',
@@ -538,7 +543,8 @@ const Annotation = () => {
         const data = new FormData();
         data.append('file', new Blob([tsv]));
         data.append('type', 'annotation');
-        data.append('name', selectedFileName);
+        data.append('fileName', selectedFileName);
+        data.append('username', currentUser);
 
         fetch('/api/file/upload', {
             method: 'POST',

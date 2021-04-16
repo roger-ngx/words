@@ -5,6 +5,6 @@ import userReducer from './userSlice'
 export default configureStore({
     reducer: {
         files: filesReducer,
-        users: userReducer
+        user: userReducer
     }
 });

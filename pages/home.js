@@ -23,7 +23,7 @@ const Home = () => {
     const selectedType = useSelector(state => state.files.selectedType);
 
     useEffect(() => {
-        // dispatch(setUsername(currentUser));
+        dispatch(setUsername(currentUser));
     }, []);
 
     useEffect(() => {
@@ -38,7 +38,7 @@ const Home = () => {
         }
     }, [selectedType]);
 
-    if(isEmpty(selectedType)){
+    if(isEmpty(currentUser)){
         router.push('/');
         return;
     }
@@ -50,7 +50,7 @@ const Home = () => {
                 <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
             </Head>
             <div style={{display: 'flex', flexDirection: 'row'}}>
-                <PageWithDrawer user={currentUser}/>
+                <PageWithDrawer />
                 <div style={{flex: 1}}>
                     {currentComponent}
                 </div>

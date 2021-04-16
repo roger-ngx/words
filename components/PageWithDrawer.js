@@ -64,7 +64,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function PageWithDrawer({window, type, files, user, children}) {
+function PageWithDrawer({window}) {
   const theme = useTheme();
   const classes = useStyles(theme);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -73,22 +73,27 @@ function PageWithDrawer({window, type, files, user, children}) {
 
   const annotationFiles = useSelector(state => state.files.annotation);
   const classificationFiles = useSelector(state => state.files.classification);
+  const currentUser = useSelector(state => state.user.username);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    getAnnotationFiles();
-  }, []);
+    if(currentUser){
+      getAnnotationFiles(currentUser);
+    }
+  }, [currentUser]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const getAnnotationFiles = () => {
+  const getAnnotationFiles = (username) => {
     const data = {
       type: 'annotation',
-      user
+      username
     };
+
+    console.log(data);
 
     fetch('/api/file/file_list', {
         method: 'POST',
@@ -104,7 +109,7 @@ function PageWithDrawer({window, type, files, user, children}) {
   const drawer = (
     <div>
       <div style={{padding: 16}}>
-        Welcome <b>{user}</b>
+        Welcome <b>{currentUser}</b>
       </div>
       <Divider />
       <List>
@@ -119,7 +124,7 @@ function PageWithDrawer({window, type, files, user, children}) {
               }
             >
                 <ListItemText button primary='Annotation' />
-                {size(annotationFiles) && (openAnnotation ? <ExpandLess /> : <ExpandMore />)}
+                {!!size(annotationFiles) && (openAnnotation ? <ExpandLess /> : <ExpandMore />)}
             </ListItem>
           {/* </Link> */}
           <Collapse in={openAnnotation} timeout="auto" unmountOnExit>

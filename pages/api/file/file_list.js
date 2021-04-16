@@ -6,11 +6,11 @@ const directoryPath = `${path.resolve('./')}/public/uploaded`;
 
 export default function handler(req, res){
 
-    const {type, user} = req.body;
+    const {type, username} = req.body;
 
-    console.log(`${directoryPath}/${type}/${user}`);
+    const dir = `${directoryPath}/${type}/${username}`;
 
-    fs.readdir(`${directoryPath}/${type}`, (err, files) => {
+    fs.readdir(dir, (err, files) => {
         if(err){
             console.log(err);
         }
