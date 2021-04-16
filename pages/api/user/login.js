@@ -12,15 +12,9 @@ const handler = async(req, res) => {
 
     const userDoc = await User.findOne({name: username}).exec();
     if(userDoc){
-        return res.json({message: 'username already exists', err: 2});
+        return res.json({message: 'username exists', err: 0});
     } else {
-        User.create({name: username}, (err, user) => {
-            if(err){
-                return res.json({message: err, err: 3});
-            }
-
-            return res.json({message: JSON.stringify(user), err: 0});
-        });
+        return res.json({message: "username doesn't exists", err: 2});
     }
 };
 

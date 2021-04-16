@@ -1,27 +1,65 @@
-import { useState } from 'react';
-import { Button, FormControl, Input, InputAdornment, InputLabel, Paper } from '@material-ui/core'
+import { useState, useEffect } from 'react';
+import { Button, CircularProgress, FormControl, Input, InputAdornment, InputLabel, Paper } from '@material-ui/core'
 import { AccountCircle } from '@material-ui/icons'
 import Head from 'next/head'
 import { useRouter } from 'next/router';
+import { isEmpty, trim } from 'lodash';
 
 export default function Home() {
 
   const [ username, setUsername ] = useState('');
+  const [ error, setError ] = useState('');
+  const [ loading, setLoading ] = useState(false);
+
   const router = useRouter();
 
   const onLogin = () => {
-    localStorage.setItem('currentUser', username);
-    router.push('/products/annotation');
+    setLoading(true);
+    fetch('/api/user/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({username})
+    }).then(res =>res.json())
+    .then(data => {
+      if(data.err === 0){
+        localStorage.setItem('currentUser', username);
+        router.push('/home');
+      } else {
+        setError(data.message);
+      }
+    }).finally(() => {
+      setLoading(false);
+    });
   }
+  
+  const onSignup = () => {
+    setLoading(true);
 
-  useEffect(() => {
     fetch('/api/user/add', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({username: 'thanh'})
-    }).then(res => console.log(res));
+      body: JSON.stringify({username})
+    }).then(res =>res.json())
+    .then(data => {
+      if(data.err === 0){
+        localStorage.setItem('currentUser', username);
+        router.push('/home');
+      } else {
+        setError(data.message);
+      }
+    }).finally(() => {
+      setLoading(false);
+    });
+  }
+
+  useEffect(() => {
+    if(localStorage.getItem('currentUser')){
+      router.push('/home');
+    }
   }, []);
 
   return (
@@ -38,7 +76,7 @@ export default function Home() {
               <FormControl>
                 <InputLabel>Type your nickname</InputLabel>
                 <Input
-                  value={username}
+                  value={trim(username)}
                   onChange={e => setUsername(e.target.value)}
                   startAdornment={
                     <InputAdornment position='start'>
@@ -47,14 +85,52 @@ export default function Home() {
                   }
                 />
               </FormControl>
-              <Button
-                style={{marginTop: 24}}
-                variant='contained'
-                color='primary'
-                onClick={onLogin}
+              {
+                !isEmpty(error) && <p style={{color: 'red'}}>{error}</p>
+              }
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  marginTop: 24
+                }}
               >
-                Login
-              </Button>
+                {
+                  !loading &&
+                  <> 
+                    <Button
+                      style={{flex: 1, marginRight: 12}}
+                      variant='contained'
+                      color='primary'
+                      onClick={onSignup}
+                      disabled={isEmpty(trim(username))}
+                    >
+                      Signup
+                    </Button>
+
+                    <Button
+                      style={{flex: 1, marginLeft: 12}}
+                      variant='outlined'
+                      color='default'
+                      onClick={onLogin}
+                      disabled={isEmpty(trim(username))}
+                    >
+                      Login
+                    </Button>
+                  </>
+                }
+                {
+                  loading &&
+                  <Button
+                    style={{flex: 1, marginRight: 12}}
+                    variant='contained'
+                    color='primary'
+                    disabled
+                  >
+                    <CircularProgress size={24} />
+                  </Button>
+                }
+              </div>
             </div>
           </Paper>
         </div>

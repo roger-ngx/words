@@ -199,7 +199,7 @@ const Annotation = () => {
     const getAnnotationFile = (fileName) => {
         const data = {
           type: 'annotation',
-          name: fileName
+          fileName
         };
     
         fetch('/api/file/read', {

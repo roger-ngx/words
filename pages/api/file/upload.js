@@ -11,9 +11,14 @@ async function handler(req, res){
         const fileName = fields.name;
         const dataType = fields.type;
 
+        const dir = `${path.resolve('./')}/public/uploaded/${dataType}`;
+        if(!fs.existsSync(dir)){
+            fs.mkdirSync(dir);
+        }
+
         const data = fs.readFileSync(files.file.path);
 
-        fs.writeFileSync(`${path.resolve('./')}/public/uploaded/${dataType}/${fileName}`, data);
+        fs.writeFileSync(`${dir}/${fileName}`, data);
         fs.unlinkSync(files.file.path);
 
         res.json({ fields });

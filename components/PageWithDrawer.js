@@ -64,7 +64,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function PageWithDrawer({window, type, files, children}) {
+function PageWithDrawer({window, type, files, user, children}) {
   const theme = useTheme();
   const classes = useStyles(theme);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -86,7 +86,8 @@ function PageWithDrawer({window, type, files, children}) {
 
   const getAnnotationFiles = () => {
     const data = {
-      type: 'annotation'
+      type: 'annotation',
+      user
     };
 
     fetch('/api/file/file_list', {
@@ -102,10 +103,12 @@ function PageWithDrawer({window, type, files, children}) {
 
   const drawer = (
     <div>
-      <div className={classes.toolbar} />
+      <div style={{padding: 16}}>
+        Welcome <b>{user}</b>
+      </div>
       <Divider />
       <List>
-          <Link href='/products/annotation'>
+          {/* <Link href='/products/annotation'> */}
             <ListItem
               button
               onClick={
@@ -118,12 +121,12 @@ function PageWithDrawer({window, type, files, children}) {
                 <ListItemText button primary='Annotation' />
                 {size(annotationFiles) && (openAnnotation ? <ExpandLess /> : <ExpandMore />)}
             </ListItem>
-          </Link>
+          {/* </Link> */}
           <Collapse in={openAnnotation} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
               {
                 map(annotationFiles, file => (
-                <Link href='/products/annotation'>
+                // <Link href='/products/annotation'>
                   <ListItem
                     button
                     className={classes.nested}
@@ -135,13 +138,13 @@ function PageWithDrawer({window, type, files, children}) {
                   >
                     <ListItemText primary={file} />
                   </ListItem>
-                </Link>
+                // </Link>
                 ))
               }
             </List>
           </Collapse>
 
-          <Link href='/products/classification'>
+          {/* <Link href='/products/classification'> */}
             <ListItem
               button
               onClick={
@@ -154,7 +157,7 @@ function PageWithDrawer({window, type, files, children}) {
               <ListItemText primary='Classification' />
               {size(classificationFiles) > 0 && (openClassification ? <ExpandLess /> : <ExpandMore />)}
             </ListItem>
-          </Link>
+          {/* </Link> */}
 
           <Collapse in={openClassification} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>

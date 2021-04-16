@@ -5,12 +5,12 @@ const directoryPath = `${path.resolve('./')}/public/uploaded`;
 
 export default function handler(req, res){
 
-    const { type, name } = req.body;
+    const { type, user, fileName } = req.body;
 
-    console.log(`${directoryPath}/${type}/${name}`);
+    console.log(`${directoryPath}/${type}/${user}/${fileName}`);
 
     try{
-        const file = fs.readFileSync(`${directoryPath}/${type}/${name}`);
+        const file = fs.readFileSync(`${directoryPath}/${type}/${user}/${fileName}`);
 
         console.log(file.toString());
 
