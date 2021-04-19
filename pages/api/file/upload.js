@@ -8,9 +8,9 @@ async function handler(req, res){
     form.parse(req, function (err, fields, files) {
         if (err) return res.err(err);
 
-        const { type, username, fileName } = fields;
+        const { projectName, username, fileName } = fields;
 
-        const dir = `${path.resolve('./')}/public/uploaded/${type}/${username}`;
+        const dir = `${path.resolve('./')}/public/uploaded/${username}/${projectName}`;
         if(!fs.existsSync(dir)){
             fs.mkdirSync(dir, { recursive: true });
         }

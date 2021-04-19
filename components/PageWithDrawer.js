@@ -16,14 +16,17 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 
-import { map, size } from 'lodash';
+import { get, map } from 'lodash';
 
 import { useSelector, useDispatch } from 'react-redux';
 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { setFiles, setSelectedType, setSelectedFileName } from 'stores/fileSlice';
+import { setFiles, addFile, setSelectedFileName, setSelectedType } from 'stores/fileSlice';
+import { ListItemIcon } from '@material-ui/core';
+import FilenameInputDialog from './FilenameInputDialog';
 
 
 const drawerWidth = 240;
@@ -71,15 +74,20 @@ function PageWithDrawer({window}) {
   const [openAnnotation, setOpenAnnotation] = useState(false);
   const [openClassification, setOpenClassification] = useState(false);
 
-  const annotationFiles = useSelector(state => state.files.annotation);
-  const classificationFiles = useSelector(state => state.files.classification);
+  const userFiles = useSelector(state => get(state, 'files.projects.default', []));
   const currentUser = useSelector(state => state.user.username);
+  const currentSelectedFile = useSelector(state => state.files.selectedFileName);
+
+  const [ openFileInput, setOpenFileInput ] = useState(false);
+  const [ currentUploadFile, setCurrentUploadFile ] = useState([]);
 
   const dispatch = useDispatch();
 
+  console.log('userFiles', userFiles);
+
   useEffect(() => {
     if(currentUser){
-      getAnnotationFiles(currentUser);
+      getUserFiles(currentUser);
     }
   }, [currentUser]);
 
@@ -87,10 +95,35 @@ function PageWithDrawer({window}) {
     setMobileOpen(!mobileOpen);
   };
 
-  const getAnnotationFiles = (username) => {
+  const onFinishInputFilename = fileName => {
+      setOpenFileInput(false);
+
+      const data = new FormData();
+      data.append('file', currentUploadFile);
+      data.append('projectName', 'default');
+      data.append('fileName', fileName);
+      data.append('username', currentUser);
+
+      fetch('/api/file/upload', {
+          method: 'POST',
+          body: data
+      }).then(res => {
+          dispatch(addFile({type: 'annotation', file: fileName}));
+      })
+  }
+
+  const fileUploadedHandle = e => {
+    console.log(e.target.files);
+    const file = e.target.files[0];
+
+    setCurrentUploadFile(file);
+    setOpenFileInput(true);
+  }
+
+  const getUserFiles = (username) => {
     const data = {
-      type: 'annotation',
-      username
+      username,
+      projectName: 'default'
     };
 
     console.log(data);
@@ -103,7 +136,7 @@ function PageWithDrawer({window}) {
         body: JSON.stringify(data)
     })
     .then(res => res.json())
-    .then(files => dispatch(setFiles({type: 'annotation', files})));
+    .then(files => dispatch(setFiles({project: 'default', files})));
   };
 
   const drawer = (
@@ -112,78 +145,98 @@ function PageWithDrawer({window}) {
         Welcome <b>{currentUser}</b>
       </div>
       <Divider />
+      <div style={{padding: 16}}>
+        Default Project
+      </div>
+      <Divider />
       <List>
-          {/* <Link href='/products/annotation'> */}
+        {
+        map(userFiles, file => (
+          <>
             <ListItem
               button
               onClick={
-                () => {
-                  setOpenAnnotation(!openAnnotation);
-                  dispatch(setSelectedType('annotation'));
-                }
+                () => dispatch(setSelectedFileName(currentSelectedFile===file ? '' : file))
               }
             >
-                <ListItemText button primary='Annotation' />
-                {!!size(annotationFiles) && (openAnnotation ? <ExpandLess /> : <ExpandMore />)}
+              <ListItemText button primary={file} />
+              { currentSelectedFile===file ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
-          {/* </Link> */}
-          <Collapse in={openAnnotation} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {
-                map(annotationFiles, file => (
-                // <Link href='/products/annotation'>
-                  <ListItem
-                    button
-                    className={classes.nested}
-                    key={file}
-                    onClick={() => {
-                      dispatch(setSelectedType('annotation'));
-                      dispatch(setSelectedFileName(file));
-                    }}
-                  >
-                    <ListItemText primary={file} />
-                  </ListItem>
-                // </Link>
-                ))
-              }
-            </List>
-          </Collapse>
+            <Collapse in={currentSelectedFile===file} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <ListItem
+                  button
+                  className={classes.nested}
+                  onClick={() => {
+                    dispatch(setSelectedType('classification'));
+                  }}
+                >
+                  <ListItemText primary='Classification' />
+                </ListItem>
 
-          {/* <Link href='/products/classification'> */}
-            <ListItem
-              button
-              onClick={
-                () => {
-                  setOpenClassification(!openClassification);
-                  dispatch(setSelectedType('classification'));
-                }
-              }
-            >
-              <ListItemText primary='Classification' />
-              {size(classificationFiles) > 0 && (openClassification ? <ExpandLess /> : <ExpandMore />)}
-            </ListItem>
-          {/* </Link> */}
+                <ListItem
+                  button
+                  className={classes.nested}
+                  onClick={() => {
+                    dispatch(setSelectedType('annotation'));
+                  }}
+                >
+                  <ListItemText primary='NER' />
+                </ListItem>
 
-          <Collapse in={openClassification} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {
-                map(classificationFiles, file => (
-                  <ListItem
-                    button
-                    className={classes.nested}
-                    key={file}
-                    onClick={() => {
-                      dispatch(setSelectedType('classification'));
-                      dispatch(setSelectedFileName(file));
-                    }}
-                  >
-                    <ListItemText primary={file} />
-                  </ListItem>
-                ))
-              }
-            </List>
-          </Collapse>
+                <ListItem
+                  button
+                  className={classes.nested}
+                  disabled
+                >
+                  <ListItemText primary='AI Automation' />
+                </ListItem>
+
+                <ListItem
+                  button
+                  className={classes.nested}
+                  disabled
+                >
+                  <ListItemText primary='MRC' />
+                </ListItem>
+
+                <ListItem
+                  button
+                  className={classes.nested}
+                  disabled
+                >
+                  <ListItemText primary='SUM' />
+                </ListItem>
+              </List>
+            </Collapse>
+          </>
+        ))
+        }
+        <input
+          style={{display: 'none', width: 0}}
+          id='tsv_file_upload'
+          multiple
+          type='file'
+          accept='.tsv'
+          onChange={fileUploadedHandle}
+          onClick={e => e.target.value = null}
+        />
+        <label htmlFor='tsv_file_upload'>
+          <ListItem
+            button
+          >
+            <ListItemIcon>
+              <AddCircleOutlineIcon />
+            </ListItemIcon>
+            <ListItemText primary='Add File' />
+          </ListItem>
+        </label>
       </List>
+      <FilenameInputDialog
+        open={openFileInput}
+        setOpen={setOpenFileInput}
+        onFinish={onFinishInputFilename}
+      />
     </div>
   );
 

@@ -1,46 +1,40 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { set } from 'lodash';
 
 export const filesSlice = createSlice({
     name: 'files',
     initialState: {
-        annotation: [],
-        classification: [],
-        selectedType: 'annotation',
-        selectedFileName: ''
+        projects: {},
+        selectedType: '',
+        selectedFileName: '',
+        selectedProject: 'default'
     },
     reducers: {
         setFiles: (state, action) => {
-            const { type, files } = action.payload;
-            switch(type){
-                case 'annotation':
-                    state.annotation = files;
-                    break;
-                case 'classification':
-                    state.classification = files;
-                    break;
-            }
+            const { project, files } = action.payload;
+            const obj = set({}, `${project}`, files);
+            state.projects = {...state.projects, ...obj};
+
         },
         addFile: (state, action) => {
-            const { type, file } = action.payload;
+            const { project, file } = action.payload;
 
-            switch(type){
-                case 'annotation':
-                    state.annotation.push(file);
-                    break;
-                case 'classification':
-                    state.classification.push(file);
-                    break;
-            }
+            const files = get(state.projects, `${project}`, []);
+
+            set(state.projects, `${project}`, [...files, file]);
         },
-        setSelectedType: (state, action) => {
-            state.selectedType = action.payload;
+        setSelectedProject: (state, action) => {
+            state.selectedProject = action.payload;
         },
         setSelectedFileName: (state, action) => {
             state.selectedFileName = action.payload;
+        },
+        setSelectedType: (state, action) => {
+            state.selectedType = action.payload;
         }
     }
 });
 
-export const { setFiles, addFile, setSelectedType, setSelectedFileName } = filesSlice.actions;
+export const { setFiles, addFile, setSelectedProject, setSelectedFileName, setSelectedType } = filesSlice.actions;
 
 export default filesSlice.reducer;

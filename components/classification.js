@@ -8,7 +8,8 @@ import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 import { makeStyles } from '@material-ui/core/styles';
-import PageWithDrawer from './PageWithDrawer';
+
+import { useSelector } from 'react-redux';
 
 const CLASSIFICATIONS = [
     {
@@ -132,24 +133,60 @@ const Classification = () => {
 
     const [currentText, setCurrentText] = useState(null);
 
+    const selectedType = useSelector(state => state.files.selectedType);
+    const selectedFileName = useSelector(state => state.files.selectedFileName);
+    const currentUser = useSelector(state => state.user.username);
+
     useEffect(() => {
-        initData();
-    }, []);
+        if(isEmpty(selectedFileName) && isEmpty(selectedType)){
+            return;
+        }
+
+        if(selectedType === 'annotation'){
+            return;
+        }
+
+        selectedFileName && getFile(selectedFileName);
+    }, [selectedType, selectedFileName]);
+
+    useEffect(() => {
+        console.log(currentText);
+    }, [currentText]);
 
     useEffect(() => console.log(selectedClass), [selectedClass]);
 
     useEffect(() => {
+        console.log('texts length', texts.length);
+
         if(texts.length > 0){
             setSelectedClass(selectedClass => classes[currentIndex]);
             setCurrentText(currentText => texts[currentIndex]);
         }
     }, [texts, currentIndex]);
 
+    const getFile = (fileName) => {
+        const data = {
+            projectName: 'default',
+            fileName,
+            username: currentUser,
+        };
+    
+        fetch('/api/file/read', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.text())
+        .then(processFileData);
+    };
+
     const processFileData = (data) => {
         const _texts = [], _classes = [];
 
         map(data.split('\n'), row => {
-            const [ text, className ] = row.split('\t');
+            const [ text, annotation, className ] = row.split('\t');
             if(!isEmpty(text)){
                 _texts.push(text);
                 _classes.push(className);
@@ -237,7 +274,17 @@ const Classification = () => {
             </Paper>
         </div>
 
-        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', position: 'fixed', bottom: 0, width: '100%', backgroundColor: 'white'}}>
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                position: 'absolute',
+                bottom: 0,
+                left: 'calc(50vw + 120px)',
+                transform: 'translate(-50%)'
+            }}
+        >
             <Button
                 color='primary'
                 variant='outlined'
@@ -253,22 +300,6 @@ const Classification = () => {
             >
                 Template
             </Button>
-            <div style={{display: 'flex', justifyContent: 'center'}}>
-                <input
-                    style={{display: 'none'}}
-                    id='tsv_file_upload'
-                    multiple
-                    type='file'
-                    accept='.tsv'
-                    onChange={fileUploadedHandle}
-                    onClick={e => e.target.value = null}
-                />
-                <label htmlFor='tsv_file_upload'>
-                    <IconButton component='span'>
-                        <InsertDriveFileIcon />
-                    </IconButton>
-                </label>
-            </div>
             <IconButton onClick={saveCurrentText}>
                 <CheckIcon style={{color:'green'}}/>
             </IconButton>

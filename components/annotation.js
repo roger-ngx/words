@@ -57,41 +57,6 @@ const AddNewAnnotationDialog = ({open, setOpen, onAddNewAnnotation}) => {
     )
 }
 
-const FilenameInputDialog = ({open, setOpen, onFinish}) => {
-    const [ fileName, setFileName ] = useState('');
-
-    const onFileNameChange = e => setFileName(e.target.value);
-
-    return (
-        <Dialog open={open} onClose={() => setOpen(false)}>
-            <DialogTitle>
-                Add a new annotation
-            </DialogTitle>
-            <DialogContent>
-                <div style={{display: 'flex', flexDirection: 'column'}}>
-                    <TextField
-                        label='file name'
-                        required
-                        onChange={onFileNameChange}
-                        value={fileName}
-                    />
-                </div>
-            </DialogContent>
-            <DialogActions>
-                <Button variant='outlined' onClick={() => setOpen(false)}>Cancel</Button>
-                <Button
-                    disabled={isEmpty(fileName)}
-                    color='primary'
-                    variant='outlined'
-                    onClick={() => onFinish(fileName + '.tsv')}
-                >
-                    Add
-                </Button>
-            </DialogActions>
-        </Dialog>
-    )
-}
-
 const HeaderTag = ({name, index, backgroundColor, color, onClick}) => {
 
     return(<div
@@ -201,9 +166,9 @@ const Annotation = () => {
 
     const getAnnotationFile = (fileName) => {
         const data = {
-          type: 'annotation',
-          fileName,
-          username: currentUser
+            projectName: 'default',
+            fileName,
+            username: currentUser,
         };
     
         fetch('/api/file/read', {
@@ -614,7 +579,7 @@ const Annotation = () => {
             }
         }}
     >
-        <Paper style={{width: 500, margin: 'auto'}}>
+        <Paper style={{width: '80%', margin: 'auto'}}>
             <div
                 style={{backgroundColor: '#583fcf', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', padding: 16}}
             >
@@ -658,7 +623,17 @@ const Annotation = () => {
             }
         </Paper>
 
-        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', position: 'absolute', bottom: 0, width: '100%'}}>
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                position: 'absolute',
+                bottom: 0,
+                left: 'calc(50vw + 120px)',
+                transform: 'translate(-50%)'
+            }}
+        >
             <Button
                 color='primary'
                 variant='outlined'
@@ -673,27 +648,6 @@ const Annotation = () => {
             >
                 Template
             </Button>
-            <div style={{display: 'flex', justifyContent: 'center'}}>
-                <input
-                    style={{display: 'none'}}
-                    id='tsv_file_upload'
-                    multiple
-                    type='file'
-                    accept='.tsv'
-                    onChange={fileUploadedHandle}
-                    onClick={e => e.target.value = null}
-                />
-                <label htmlFor='tsv_file_upload'>
-                    <IconButton component='span'>
-                        <InsertDriveFileIcon />
-                    </IconButton>
-                </label>
-                <FilenameInputDialog
-                    open={openFileInput}
-                    setOpen={setOpenFileInput}
-                    onFinish={onFinishInputFilename}
-                />
-            </div>
             <IconButton onClick={saveCurrentText}>
                 <CheckIcon style={{color:'green'}}/>
             </IconButton>
