@@ -16,13 +16,18 @@ const Home = () => {
 
     const [ currentComponent, setCurrentComponent ] = useState();
 
-    const currentUser = (typeof window === undefined) ? '' : localStorage.getItem('currentUser');
-
     const router = useRouter();
 
     const selectedType = useSelector(state => state.files.selectedType);
 
     useEffect(() => {
+        const currentUser = (typeof window === undefined) ? '' : localStorage.getItem('currentUser');
+
+        if(isEmpty(currentUser)){
+            router.push('/');
+            return;
+        }
+
         dispatch(setUsername(currentUser));
     }, []);
 
@@ -37,11 +42,6 @@ const Home = () => {
                 break;
         }
     }, [selectedType]);
-
-    if(isEmpty(currentUser)){
-        router.push('/');
-        return;
-    }
 
     return (
         <React.Fragment>
