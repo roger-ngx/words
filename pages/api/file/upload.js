@@ -1,4 +1,5 @@
 import runCors from 'middleware/cors';
+import NextCors from 'nextjs-cors';
 
 const micro = require('micro');
 const formidable = require('formidable');
@@ -6,7 +7,14 @@ const fs = require('fs');
 const path = require('path');
 
 async function handler(req, res){
-    await runCors(rq, res);
+    // await runCors(rq, res);
+
+    await NextCors(req, res, {
+        // Options
+        methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+        origin: '*',
+        optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+     });
 
     const form = new formidable.IncomingForm({ keepExtensions: true });
     form.parse(req, function (err, fields, files) {

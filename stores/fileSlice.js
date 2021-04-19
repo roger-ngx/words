@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { set } from 'lodash';
+import { set, get } from 'lodash';
 
 export const filesSlice = createSlice({
     name: 'files',

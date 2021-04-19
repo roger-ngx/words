@@ -638,7 +638,7 @@ const Annotation = () => {
                 color='primary'
                 variant='outlined'
                 onClick={() => {
-                    const data = `"From 53-3 overnight, England's only goal on the fourth day was to survive as long as possible on a pitch offering huge and unpredictable turn as well as occasional spitting bounce . Dan Lawrence tried to be proactive, running at Ashwin's first ball to be nutmegged, with Pant completing a spectacular diving stumping. In contrast, Ben Stokes was almost shot-less, tormented by Ashwin in making eight from 51 balls before he offered a bat-pad catch."	O O O ORG-B O O O O O O O O O O O O O O O O O O O O O O O O O O O O PER-B PER-I O O O O O O PER-B O O O O O O PER-B O O O O O O PER-B ORG-B ORG-I O O O O O PER-B O O O O O O O O O O O O`
+                    const data = `From 53-3 overnight, England's only goal on the fourth day was to survive as long as possible on a pitch offering huge and unpredictable turn as well as occasional spitting bounce . Dan Lawrence tried to be proactive, running at Ashwin's first ball to be nutmegged, with Pant completing a spectacular diving stumping. In contrast, Ben Stokes was almost shot-less, tormented by Ashwin in making eight from 51 balls before he offered a bat-pad catch.	O O O ORG-B O O O O O O O O O O O O O O O O O O O O O O O O O O O O PER-B PER-I O O O O O O PER-B O O O O O O PER-B O O O O O O PER-B ORG-B ORG-I O O O O O PER-B O O O O O O O O O O O O`
                     const url = URL.createObjectURL(new Blob([data], { type: 'text/tab-separated-values' }))
                     const link = document.createElement('a');
                     link.href = url;
