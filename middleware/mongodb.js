@@ -5,7 +5,7 @@ const connectDB = handler => async (req, res) => {
         return handler(req, res);
     }
 
-    await mongoose.connect(process.env.MONGO_DB_URL, {
+    await mongoose.connect('mongodb+srv://thanh:thanh@cluster0.61tgr.mongodb.net/words?retryWrites=true&w=majority', {
         useUnifiedTopology: true,
         useFindAndModify: true,
         useCreateIndex: true,
