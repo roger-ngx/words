@@ -1,8 +1,20 @@
-import Cors from 'cors';
-import initMiddleware from "./initMiddleware";
+import Cors from 'cors'
 
-export default cors = initMiddleware(
-    Cors({
-        methods: ['GET', 'POST', 'OPTIONS'],
+// Initializing the cors middleware
+const cors = Cors({
+  methods: ['GET', 'POST'],
+})
+
+// Helper method to wait for a middleware to execute before continuing
+// And to throw an error when an error happens in a middleware
+export default function runCors(req, res) {
+  return new Promise((resolve, reject) => {
+    cors(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result)
+      }
+
+      return resolve(result)
     })
-)
+  })
+}
