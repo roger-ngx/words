@@ -106,7 +106,8 @@ function PageWithDrawer({window}) {
 
       fetch('/api/file/upload', {
           method: 'POST',
-          body: data
+          body: data,
+          mode: 'cors',
       }).then(res => {
           dispatch(addFile({type: 'annotation', file: fileName}));
       })
