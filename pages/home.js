@@ -51,7 +51,7 @@ const Home = () => {
             </Head>
             <div style={{display: 'flex', flexDirection: 'row'}}>
                 <PageWithDrawer />
-                <div style={{flex: 1}}>
+                <div style={{flex: 1, marginTop: 32}}>
                     {currentComponent}
                 </div>
             </div>

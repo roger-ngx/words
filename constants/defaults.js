@@ -1,0 +1,1 @@
+export const API_SERVER_ADDRESS = 'https://183.96.253.147:8053';

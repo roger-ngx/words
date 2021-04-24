@@ -11,6 +11,7 @@ import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { addFile } from 'stores/fileSlice';
+import { API_SERVER_ADDRESS } from 'constants/defaults';
 
 const AddNewAnnotationDialog = ({open, setOpen, onAddNewAnnotation}) => {
     const [ verified, setVerified ] = useState(false);
@@ -171,7 +172,7 @@ const Annotation = () => {
             username: currentUser,
         };
     
-        fetch('/api/file/read', {
+        fetch(API_SERVER_ADDRESS + '/api/file/read', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -513,10 +514,11 @@ const Annotation = () => {
 
         fetch('/api/file/upload', {
             method: 'POST',
-            body: data
+            body: data,
+            mode: 'cors'
         }).then(res => {
             alert('done');
-        })
+        }).catch(console.log)
     }
 
     const saveCurrentText = () => {
