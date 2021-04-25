@@ -284,6 +284,7 @@ const Classification = () => {
                 bottom: 0,
                 left: '50vw',
                 backgroundColor: 'white',
+                alignItems: 'center'
             }}
         >
             <Button
@@ -313,6 +314,7 @@ const Classification = () => {
             >
                 <SkipPreviousIcon style={{color:'blue'}}/>
             </IconButton>
+            {`${currentIndex + 1}/${size(texts)}`}
             <IconButton
                 disabled={currentIndex >= size(texts)}
                 onClick={() => (currentIndex < size(texts) - 1) && setCurrentIndex(currentIndex + 1)}
