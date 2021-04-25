@@ -571,7 +571,7 @@ const Annotation = () => {
     }
 
     return (<div
-        style={{outline: 'none'}}
+        style={{outline: 'none', height: 'calc(100vh - 32px)', position: 'relative'}}
         tabIndex="0"
         onKeyDown={e => {
             const { keyCode } = e;
@@ -630,10 +630,10 @@ const Annotation = () => {
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: 'center',
-                position: 'sticky',
+                position: 'fixed',
                 bottom: 0,
-                left: 'calc(50vw + 120px)',
-                backgroundColor: 'white'
+                left: '50vw',
+                backgroundColor: 'white',
             }}
         >
             <Button

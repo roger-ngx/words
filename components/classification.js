@@ -280,10 +280,10 @@ const Classification = () => {
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: 'center',
-                position: 'sticky',
+                position: 'fixed',
                 bottom: 0,
-                left: 'calc(50vw + 120px)',
-                backgroundColor: 'white'
+                left: '50vw',
+                backgroundColor: 'white',
             }}
         >
             <Button
