@@ -11,6 +11,7 @@ import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { addFile } from 'stores/fileSlice';
+import { API_SERVER_ADDRESS } from 'constants/defaults';
 
 const AddNewAnnotationDialog = ({open, setOpen, onAddNewAnnotation}) => {
     const [ verified, setVerified ] = useState(false);
@@ -171,7 +172,7 @@ const Annotation = () => {
             username: currentUser,
         };
     
-        fetch('/api/file/read', {
+        fetch(API_SERVER_ADDRESS + '/api/file/read', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -513,10 +514,11 @@ const Annotation = () => {
 
         fetch('/api/file/upload', {
             method: 'POST',
-            body: data
+            body: data,
+            mode: 'cors'
         }).then(res => {
             alert('done');
-        })
+        }).catch(console.log)
     }
 
     const saveCurrentText = () => {
@@ -569,7 +571,7 @@ const Annotation = () => {
     }
 
     return (<div
-        style={{outline: 'none'}}
+        style={{outline: 'none', height: 'calc(100vh - 32px)', position: 'relative'}}
         tabIndex="0"
         onKeyDown={e => {
             const { keyCode } = e;
@@ -628,10 +630,11 @@ const Annotation = () => {
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: 'center',
-                position: 'absolute',
+                position: 'fixed',
                 bottom: 0,
-                left: 'calc(50vw + 120px)',
-                transform: 'translate(-50%)'
+                left: '50vw',
+                backgroundColor: 'white',
+                alignItems: 'center'
             }}
         >
             <Button
@@ -660,6 +663,7 @@ const Annotation = () => {
             >
                 <SkipPreviousIcon style={{color:'blue'}}/>
             </IconButton>
+            {`${currentIndex + 1}/${size(texts)}`}
             <IconButton
                 disabled={currentIndex >= size(texts)}
                 onClick={() => (currentIndex < size(texts) - 1) && setCurrentIndex(currentIndex + 1)}

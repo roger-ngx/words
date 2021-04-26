@@ -10,6 +10,7 @@ import SkipNextIcon from '@material-ui/icons/SkipNext';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { useSelector } from 'react-redux';
+import { API_SERVER_ADDRESS } from 'constants/defaults';
 
 const CLASSIFICATIONS = [
     {
@@ -171,7 +172,7 @@ const Classification = () => {
             username: currentUser,
         };
     
-        fetch('/api/file/read', {
+        fetch(API_SERVER_ADDRESS + '/api/file/read', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -247,7 +248,7 @@ const Classification = () => {
         >
             <Paper
                 style={{
-                    width: 500,
+                    width: '80%',
                     padding: 24,
                     height: '100%',
                     overflowY: 'scroll'
@@ -279,10 +280,11 @@ const Classification = () => {
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: 'center',
-                position: 'absolute',
+                position: 'fixed',
                 bottom: 0,
-                left: 'calc(50vw + 120px)',
-                transform: 'translate(-50%)'
+                left: '50vw',
+                backgroundColor: 'white',
+                alignItems: 'center'
             }}
         >
             <Button
@@ -312,6 +314,7 @@ const Classification = () => {
             >
                 <SkipPreviousIcon style={{color:'blue'}}/>
             </IconButton>
+            {`${currentIndex + 1}/${size(texts)}`}
             <IconButton
                 disabled={currentIndex >= size(texts)}
                 onClick={() => (currentIndex < size(texts) - 1) && setCurrentIndex(currentIndex + 1)}

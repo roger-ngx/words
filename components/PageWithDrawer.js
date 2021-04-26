@@ -27,6 +27,7 @@ import { useRouter } from 'next/router';
 import { setFiles, addFile, setSelectedFileName, setSelectedType } from 'stores/fileSlice';
 import { ListItemIcon } from '@material-ui/core';
 import FilenameInputDialog from './FilenameInputDialog';
+import { API_SERVER_ADDRESS } from 'constants/defaults';
 
 
 const drawerWidth = 240;
@@ -83,8 +84,6 @@ function PageWithDrawer({window}) {
 
   const dispatch = useDispatch();
 
-  console.log('userFiles', userFiles);
-
   useEffect(() => {
     if(currentUser){
       getUserFiles(currentUser);
@@ -104,9 +103,10 @@ function PageWithDrawer({window}) {
       data.append('fileName', fileName);
       data.append('username', currentUser);
 
-      fetch('/api/file/upload', {
+      fetch(API_SERVER_ADDRESS+'/api/file/upload', {
           method: 'POST',
           body: data,
+          mode: 'cors'
       }).then(res => {
           dispatch(addFile({project: 'default', file: fileName}));
       })
@@ -126,17 +126,19 @@ function PageWithDrawer({window}) {
       projectName: 'default'
     };
 
-    console.log(data);
+    console.log('data', data);
 
-    fetch('/api/file/file_list', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
+    fetch(API_SERVER_ADDRESS + '/api/file/list', {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
     })
     .then(res => res.json())
-    .then(files => dispatch(setFiles({project: 'default', files})));
+    .then(({files}) => dispatch(setFiles({project: 'default', files})));
   };
 
   const drawer = (
