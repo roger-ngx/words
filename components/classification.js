@@ -138,6 +138,7 @@ const ClassificationSelection = ({index, label, value, check=false, onChange, on
                             position: relative;
                             cursor: pointer;
                             margin-right: 12px;
+                            height: 48px;
                         }
 
                         .classification:hover{
