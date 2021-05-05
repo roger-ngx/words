@@ -83,6 +83,7 @@ function PageWithDrawer({window}) {
   const [ currentUploadFile, setCurrentUploadFile ] = useState([]);
 
   const dispatch = useDispatch();
+  const router = useRouter();
 
   useEffect(() => {
     if(currentUser){
@@ -143,8 +144,17 @@ function PageWithDrawer({window}) {
 
   const drawer = (
     <div>
-      <div style={{padding: 16}}>
-        Welcome <b>{currentUser}</b>
+      <div style={{padding: 16, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+        <div>Welcome <b>{currentUser}</b></div>
+        <div
+          style={{fontSize: 12, border: 'solid 1px #ddd', padding: '4px 8px', borderRadius: 20, cursor: 'pointer'}}
+          onClick={() => {
+            localStorage.setItem('currentUser', '');
+            router.push('/');
+          }}
+        >
+          Logout
+        </div>
       </div>
       <Divider />
       <div style={{padding: 16}}>
