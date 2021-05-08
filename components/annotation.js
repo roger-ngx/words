@@ -537,7 +537,7 @@ const Annotation = () => {
             }
         }}
     >
-        <Paper style={{width: '80%', margin: 'auto'}}>
+        <Paper style={{width: '80%', margin: 'auto'}} elevation={2}>
             <div
                 style={{backgroundColor: '#583fcf', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', padding: 16}}
             >

@@ -301,8 +301,10 @@ const Classification = () => {
                     width: '80%',
                     padding: 24,
                     height: '100%',
-                    overflowY: 'scroll'
+                    overflowY: 'scroll',
+                    border: '1px solid #eee'
                 }}
+                elevation={2}
             >
                 <p style={{textAlign: 'justify'}}>
                     {currentText}

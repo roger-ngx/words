@@ -72,7 +72,7 @@ export default function Home() {
 
       <main>
         <div>
-          <Paper style={{padding: 24}}>
+          <Paper style={{padding: 24, border: '1px solid #eee'}} elevation={2}>
             <div style={{display: 'flex', flexDirection: 'column'}}>
               <FormControl>
                 <InputLabel>Type your nickname</InputLabel>
