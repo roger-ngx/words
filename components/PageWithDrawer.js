@@ -154,7 +154,7 @@ function PageWithDrawer({window}) {
       <List>
         {
         map(userFiles, file => (
-          <>
+          <div key={file}>
             <ListItem
               button
               onClick={
@@ -211,7 +211,7 @@ function PageWithDrawer({window}) {
                 </ListItem>
               </List>
             </Collapse>
-          </>
+          </div>
         ))
         }
         <input
