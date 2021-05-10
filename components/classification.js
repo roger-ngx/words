@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardContent, Paper, Button, IconButton, FormControlLabel, Radio } from '@material-ui/core';
-import { split, map, isEmpty, forEach, findIndex, slice, range, remove, intersection, includes, join, size, get } from 'lodash';
+import { Paper, Button, IconButton, Radio, Typography } from '@material-ui/core';
+import { map, isEmpty, size } from 'lodash';
+import { useSelector } from 'react-redux';
+import { API_SERVER_ADDRESS } from 'constants/defaults';
 
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
-import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
 import { makeStyles } from '@material-ui/core/styles';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 
-import { useSelector } from 'react-redux';
-import { API_SERVER_ADDRESS } from 'constants/defaults';
+import AddNewClassDialog from './AddNewClassDialog';
 
 const CLASSIFICATIONS = [
     {
@@ -21,42 +23,43 @@ const CLASSIFICATIONS = [
         name: '🌄 Adventure',
         value: 'adventure'
     },
-    {
-        name: '😄 Comedy',
-        value: 'comedy'
-    },
-    {
-        name: '🎭 Drama',
-        value: 'drama'
-    },
-    {
-        name:'👪 Family film',
-        value: 'family film'
-    },
-    {
-        name: '💀 Horror',
-        value: 'horror'
-    },
-    {
-        name: '🔎 Mystery',
-        value: 'mystery'
-    },
-    {
-        name: '💞 Romance',
-        value: 'romance'
-    },
-    {
-        name: '👽 Science-Fiction',
-        value: 'science-fiction'
-    },
-    {
-        name: '🙈 Thriller',
-        value: 'thriller'
-    },
-    {
-        name: '🌌 Other',
-        value: 'other'
-    }];
+    // {
+    //     name: '😄 Comedy',
+    //     value: 'comedy'
+    // },
+    // {
+    //     name: '🎭 Drama',
+    //     value: 'drama'
+    // },
+    // {
+    //     name:'👪 Family film',
+    //     value: 'family film'
+    // },
+    // {
+    //     name: '💀 Horror',
+    //     value: 'horror'
+    // },
+    // {
+    //     name: '🔎 Mystery',
+    //     value: 'mystery'
+    // },
+    // {
+    //     name: '💞 Romance',
+    //     value: 'romance'
+    // },
+    // {
+    //     name: '👽 Science-Fiction',
+    //     value: 'science-fiction'
+    // },
+    // {
+    //     name: '🙈 Thriller',
+    //     value: 'thriller'
+    // },
+    // {
+    //     name: '🌌 Other',
+    //     value: 'other'
+    // }
+];
 
 const useStyles = makeStyles({
     root: {
@@ -66,35 +69,43 @@ const useStyles = makeStyles({
     }
 });
 
-const ClassificationSelection = ({index, label, value, check=false, onChange}) => {
+const ClassificationSelection = ({index, label, value, check=false, onChange, onDeleteClass}) => {
 
     return (
-        <div
-            className='classification'
-            onClick={(e) => {
-                onChange(value);
-                e.preventDefault();
-            }}
-        >
-            <Radio
-                checked={check}
-                value={label}
-            />
-            <p>{label}</p>
+        <div className='containner'>
             <div
-                style={{
-                    position: 'absolute',
-                    border: 'solid 1px #ddd',
-                    width: 24, height: 24,
-                    right: -12,
-                    top: 'calc(50% - 12px)',
-                    backgroundColor: '#fff',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
+                className='classification'
+                onClick={(e) => {
+                    onChange(value);
+                    e.preventDefault();
                 }}
             >
-                <p>{index===10 ? '-' : index}</p>
+                <Radio
+                    checked={check}
+                    value={label}
+                />
+                <p>{label}</p>
+                <div
+                    style={{
+                        position: 'absolute',
+                        border: 'solid 1px #ddd',
+                        width: 24, height: 24,
+                        right: -12,
+                        top: 'calc(50% - 12px)',
+                        backgroundColor: '#fff',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
+                >
+                    <p>{index===10 ? '-' : index}</p>
+                </div>
+            </div>
+
+            <div className='delete'>
+                <IconButton onClick={() => onDeleteClass(index)}>
+                    <RemoveCircleOutlineIcon />
+                </IconButton>
             </div>
             <style jsx>
                 {
@@ -103,15 +114,31 @@ const ClassificationSelection = ({index, label, value, check=false, onChange}) =
                             margin: 0
                         }
 
+                        .delete{
+                            display: none
+                        }
+
+                        .containner {
+                            display: flex;
+                            flex-direction: row;
+                            align-items: center;
+                            margin-bottom: 12px;
+                        }
+                        .containner:hover>.delete{
+                            display: flex;
+                        }
+
                         .classification {
                             display: flex;
+                            flex: 1;
                             flex-direction: row;
                             align-items: center;
                             border: solid 1px #ddd;
                             border-radius: 4px;
                             position: relative;
-                            margin-bottom: 12px;
                             cursor: pointer;
+                            margin-right: 12px;
+                            height: 48px;
                         }
 
                         .classification:hover{
@@ -126,6 +153,8 @@ const ClassificationSelection = ({index, label, value, check=false, onChange}) =
 
 const Classification = () => {
 
+    const [classifications, setClassifications] = useState(CLASSIFICATIONS);
+    const [openClassInput, setOpenClassInput] = useState(false);
     const [texts, setTexts] = useState([]);
     const [classes, setClasses] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -137,6 +166,11 @@ const Classification = () => {
     const selectedType = useSelector(state => state.files.selectedType);
     const selectedFileName = useSelector(state => state.files.selectedFileName);
     const currentUser = useSelector(state => state.user.username);
+
+    useEffect(() =>{
+        const classifications = JSON.parse(localStorage.getItem('userDefineClassificationss'));
+        setClassifications(classifications || CLASSIFICATIONS);
+    }, []);
 
     useEffect(() => {
         if(isEmpty(selectedFileName) && isEmpty(selectedType)){
@@ -202,6 +236,17 @@ const Classification = () => {
         setTexts(texts => _texts);
     }
 
+    useEffect(() => {
+        if(!isEmpty(classifications)){
+            localStorage.setItem('userDefineClassificationss', JSON.stringify(classifications));
+        }
+    }, [classifications]);
+
+    const onAddNewClass = newClass => {
+        setClassifications([...classifications, {name: newClass, value: newClass}]);
+        setOpenClassInput(false);
+    }
+
     const initData = () => {
         fetch('/classification_testset.tsv').then(res => res.text()).then(processFileData);
     };
@@ -228,6 +273,11 @@ const Classification = () => {
         setSelectedClass(classes[currentIndex]);
     }
 
+    const onDeleteClass = index => {
+        classifications.splice(index, 1);
+        setClassifications([...classifications]);
+    }
+
     // const classes = useStyles();
 
     return (<>
@@ -238,11 +288,11 @@ const Classification = () => {
                 const { keyCode } = e;
                 console.log(keyCode);
                 if(keyCode >= 48 && keyCode <=57){
-                    setSelectedClass(CLASSIFICATIONS[keyCode - 48].value);
+                    setSelectedClass(classifications[keyCode - 48].value);
                 }
 
                 if(keyCode === 189){
-                    setSelectedClass(CLASSIFICATIONS[10].value);
+                    setSelectedClass(classifications[10].value);
                 }
             }}
         >
@@ -251,15 +301,17 @@ const Classification = () => {
                     width: '80%',
                     padding: 24,
                     height: '100%',
-                    overflowY: 'scroll'
+                    overflowY: 'scroll',
+                    border: '1px solid #eee'
                 }}
+                elevation={2}
             >
                 <p style={{textAlign: 'justify'}}>
                     {currentText}
                 </p>
                 {
                     map(
-                        CLASSIFICATIONS,
+                        classifications,
                         ({name, value}, index) => (
                             <ClassificationSelection
                                 key={value}
@@ -268,11 +320,35 @@ const Classification = () => {
                                 value={value}
                                 check={selectedClass===value}
                                 onChange={setSelectedClass}
+                                onDeleteClass={onDeleteClass}
                             />
                         )
                     )
                 }
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        cursor: 'pointer',
+                        border: 'solid 1px #ddd',
+                        borderRadius: 4,
+                        alignItems: 'center',
+                        padding: 10
+                    }}
+                    onClick={() => setOpenClassInput(true)}
+                >
+                    <AddCircleOutlineIcon style={{color: 'rgba(0, 0, 0, 0.54)', marginRight: 8}}/>
+                    <Typography>Add a new class</Typography>
+                </div>
             </Paper>
+            {
+                openClassInput &&
+                <AddNewClassDialog
+                    open={openClassInput}
+                    setOpen={setOpenClassInput}
+                    onAddNewClass={onAddNewClass}
+                />
+            }
         </div>
 
         <div

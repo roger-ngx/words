@@ -4,6 +4,7 @@ import { AccountCircle } from '@material-ui/icons'
 import Head from 'next/head'
 import { useRouter } from 'next/router';
 import { isEmpty, trim } from 'lodash';
+import { API_SERVER_ADDRESS } from 'constants/defaults';
 
 export default function Home() {
 
@@ -15,7 +16,7 @@ export default function Home() {
 
   const onLogin = () => {
     setLoading(true);
-    fetch('/api/user/login', {
+    fetch(API_SERVER_ADDRESS + '/api/user/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -37,7 +38,7 @@ export default function Home() {
   const onSignup = () => {
     setLoading(true);
 
-    fetch('/api/user/add', {
+    fetch(API_SERVER_ADDRESS + '/api/user/signup', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -71,7 +72,7 @@ export default function Home() {
 
       <main>
         <div>
-          <Paper style={{padding: 24}}>
+          <Paper style={{padding: 24, border: '1px solid #eee'}} elevation={2}>
             <div style={{display: 'flex', flexDirection: 'column'}}>
               <FormControl>
                 <InputLabel>Type your nickname</InputLabel>

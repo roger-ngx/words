@@ -12,51 +12,7 @@ import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import { useDispatch, useSelector } from 'react-redux';
 import { addFile } from 'stores/fileSlice';
 import { API_SERVER_ADDRESS } from 'constants/defaults';
-
-const AddNewAnnotationDialog = ({open, setOpen, onAddNewAnnotation}) => {
-    const [ verified, setVerified ] = useState(false);
-    const [ longName, setLongName ] = useState('');
-    const [ shortName, setShortName ] = useState('');
-
-    const addNewAnnotation = () => {
-        setVerified(true);
-        !isEmpty(longName) && !isEmpty(shortName) && onAddNewAnnotation({longName, shortName});
-    };
-
-    const onShortNameChange = e => setShortName(e.target.value);
-
-    const onLongNameChange = e => setLongName(e.target.value);
-
-    return (
-        <Dialog open={open} onClose={() => setOpen(false)}>
-            <DialogTitle>
-                Add a new annotation
-            </DialogTitle>
-            <DialogContent>
-                <div style={{display: 'flex', flexDirection: 'column'}}>
-                    <TextField
-                        label='long name'
-                        required
-                        helperText={verified && isEmpty(longName) && 'required'}
-                        onChange={onLongNameChange}
-                        value={longName}
-                    />
-                    <TextField
-                        label='short name'
-                        required
-                        helperText={verified && isEmpty(shortName) && 'required'}
-                        onChange={onShortNameChange}
-                        value={shortName}
-                    />
-                </div>
-            </DialogContent>
-            <DialogActions>
-                <Button variant='outlined' onClick={() => setOpen(false)}>Cancel</Button>
-                <Button color='primary' variant='outlined' onClick={addNewAnnotation}>Add</Button>
-            </DialogActions>
-        </Dialog>
-    )
-}
+import AddNewAnnotationDialog from './AddNewAnnotationDialog';
 
 const HeaderTag = ({name, index, backgroundColor, color, onClick}) => {
 
@@ -117,7 +73,7 @@ const Annotation = () => {
     const [currentAnnotation, setCurrentAnnotation] = useState(null);
     
     const [words, setWords] = useState([]);
-    // const spaceIndices = [];
+
     const [ tags, setTags ] = useState([]);
 
     const [ markedIndices, setMarkedIndicies ] = useState([]);
@@ -435,7 +391,7 @@ const Annotation = () => {
     }
 
     const processFileData = data => {
-        const rows = data.split('\n"');
+        const rows = data.split('\n');
         const _texts = [];
         const _annotations = [];
 
@@ -583,7 +539,7 @@ const Annotation = () => {
             }
         }}
     >
-        <Paper style={{width: '80%', margin: 'auto'}}>
+        <Paper style={{width: '80%', margin: 'auto'}} elevation={2}>
             <div
                 style={{backgroundColor: '#583fcf', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', padding: 16}}
             >
