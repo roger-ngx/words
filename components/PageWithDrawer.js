@@ -22,10 +22,9 @@ import { get, map } from 'lodash';
 
 import { useSelector, useDispatch } from 'react-redux';
 
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { setFiles, addFile, setSelectedFileName, setSelectedType } from 'stores/fileSlice';
-import { ListItemIcon } from '@material-ui/core';
+import { setFiles, addFile, setSelectedFileName, setSelectedProject } from 'stores/fileSlice';
+import { ListItemIcon, Button } from '@material-ui/core';
 import FilenameInputDialog from './FilenameInputDialog';
 import { API_SERVER_ADDRESS } from 'constants/defaults';
 
@@ -78,6 +77,7 @@ function PageWithDrawer({window}) {
   const userFiles = useSelector(state => get(state, 'files.projects.default', []));
   const currentUser = useSelector(state => state.user.username);
   const currentSelectedFile = useSelector(state => state.files.selectedFileName);
+  const currentSelectedProject = useSelector(state => state.files.selectedProject);
 
   const [ openFileInput, setOpenFileInput ] = useState(false);
   const [ currentUploadFile, setCurrentUploadFile ] = useState([]);
@@ -143,7 +143,7 @@ function PageWithDrawer({window}) {
   };
 
   const drawer = (
-    <div>
+    <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
       <div style={{padding: 16, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
         <div>Welcome <b>{currentUser}</b></div>
         <div
@@ -157,93 +157,68 @@ function PageWithDrawer({window}) {
         </div>
       </div>
       <Divider />
-      <div style={{padding: 16}}>
-        Default Project
-      </div>
-      <Divider />
-      <List>
-        {
-        map(userFiles, file => (
-          <>
+      <div style={{flex: 1}}>
+        <List>
             <ListItem
               button
               onClick={
-                () => dispatch(setSelectedFileName(currentSelectedFile===file ? '' : file))
+                () => dispatch(setSelectedProject(currentSelectedProject==='Default Project' ? '' : 'Default Project'))
               }
             >
-              <ListItemText button primary={file} />
-              { currentSelectedFile===file ? <ExpandLess /> : <ExpandMore />}
+              <ListItemText button primary='Default Project' />
+              <ExpandMore />
             </ListItem>
-            <Collapse in={currentSelectedFile===file} timeout="auto" unmountOnExit>
+            <Collapse in={currentSelectedProject==='Default Project'} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                <ListItem
-                  button
-                  className={classes.nested}
-                  onClick={() => {
-                    dispatch(setSelectedType('classification'));
-                  }}
-                >
-                  <ListItemText primary='Classification' />
-                </ListItem>
-
-                <ListItem
-                  button
-                  className={classes.nested}
-                  onClick={() => {
-                    dispatch(setSelectedType('annotation'));
-                  }}
-                >
-                  <ListItemText primary='NER' />
-                </ListItem>
-
-                <ListItem
-                  button
-                  className={classes.nested}
-                  disabled
-                >
-                  <ListItemText primary='AI Automation' />
-                </ListItem>
-
-                <ListItem
-                  button
-                  className={classes.nested}
-                  disabled
-                >
-                  <ListItemText primary='MRC' />
-                </ListItem>
-
-                <ListItem
-                  button
-                  className={classes.nested}
-                  disabled
-                >
-                  <ListItemText primary='SUM' />
-                </ListItem>
+                {
+                  map(userFiles, file => (
+                    <ListItem
+                      key={file}
+                      button
+                      className={classes.nested}
+                      selected={currentSelectedFile===file}
+                      onClick={
+                        () => dispatch(setSelectedFileName(currentSelectedFile===file ? '' : file))
+                      }
+                    >
+                      <ListItemText primary={file} />
+                    </ListItem>
+                  ))
+                }
+                <label htmlFor='tsv_file_upload'>
+                  <ListItem
+                    button
+                    className={classes.nested}
+                  >
+                    <ListItemIcon>
+                      <AddCircleOutlineIcon />
+                    </ListItemIcon>
+                    <ListItemText primary='Add File' />
+                  </ListItem>
+                </label>
               </List>
             </Collapse>
-          </>
-        ))
-        }
-        <input
-          style={{display: 'none', width: 0}}
-          id='tsv_file_upload'
-          multiple
-          type='file'
-          accept='.tsv'
-          onChange={fileUploadedHandle}
-          onClick={e => e.target.value = null}
-        />
+          <input
+            style={{display: 'none', width: 0}}
+            id='tsv_file_upload'
+            multiple
+            type='file'
+            accept='.tsv'
+            onChange={fileUploadedHandle}
+            onClick={e => e.target.value = null}
+          />
+        </List>
+      </div>
+      <div style={{marginBottom: 10, textAlign: 'center'}}>
         <label htmlFor='tsv_file_upload'>
-          <ListItem
+          <Button
             button
+            variant='outlined'
           >
-            <ListItemIcon>
-              <AddCircleOutlineIcon />
-            </ListItemIcon>
-            <ListItemText primary='Add File' />
-          </ListItem>
+            Add Project
+          </Button>
         </label>
-      </List>
+      </div>
       <FilenameInputDialog
         open={openFileInput}
         setOpen={setOpenFileInput}

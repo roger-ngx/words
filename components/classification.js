@@ -218,6 +218,7 @@ const Classification = () => {
     };
 
     const processFileData = (data) => {
+        console.log('classification', data);
         const _texts = [], _classes = [];
 
         map(data.split('\n'), row => {
