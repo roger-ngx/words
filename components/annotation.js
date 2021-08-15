@@ -220,10 +220,12 @@ const Annotation = () => {
     }
 
     function logSelection(isDbClick) {
-        const selection = window.getSelection();
+        const selection = window.getSelection() ||  window.getSelection;
+
+        console.log('selection', selection);
         
         const startId = +selection.anchorNode.parentNode.id;
-        const endId = +selection.extentNode.parentNode.id;
+        const endId = +(selection.extentNode || selection.focusNode).parentNode.id;
 
         console.log(startId, endId, isDbClick);
         console.log('markedIndices', markedIndices);
