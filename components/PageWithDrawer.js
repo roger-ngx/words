@@ -143,7 +143,7 @@ function PageWithDrawer({window}) {
   };
 
   const drawer = (
-    <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
+    <div style={{flex: 1, display: 'flex', flexDirection: 'column', width: '100%'}}>
       <div style={{padding: 16, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
         <div>Welcome <b>{currentUser}</b></div>
         <div

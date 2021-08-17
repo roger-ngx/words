@@ -218,19 +218,20 @@ const Classification = () => {
     };
 
     const processFileData = (data) => {
-        console.log('classification', data);
+        // console.log('classification', data);
         const _texts = [], _classes = [];
 
         map(data.split('\n'), row => {
             const [ text, annotation, className ] = row.split('\t');
+            console.log('className', className);
             if(!isEmpty(text)){
                 _texts.push(text);
                 _classes.push(className);
             }
         });
 
-        console.log('texts', _texts);
-        console.log('classes', _classes);
+        // console.log('texts', _texts);
+        // console.log('classes', _classes);
 
 
         setClasses(classes => _classes);
@@ -266,8 +267,34 @@ const Classification = () => {
 
     const saveCurrentText = () => {
         classes[currentIndex] = selectedClass;
-        alert('saved');
-        // setTexts([...texts])
+        saveEdittedFile();
+    }
+
+    const saveEdittedFile = () => {
+        if(isEmpty(selectedFileName)){
+            return;
+        }
+
+        var tsv = '';
+
+        forEach(texts, (text, index) => {
+            tsv += `\n${text}\t\t${classes[index]}`;
+        })
+
+        const data = new FormData();
+        data.append('file', new Blob([tsv]));
+        data.append('type', 'classification');
+        data.append('projectName', 'default');
+        data.append('fileName', selectedFileName);
+        data.append('username', currentUser);
+
+        fetch(API_SERVER_ADDRESS + '/api/file/upload', {
+            method: 'POST',
+            body: data,
+            mode: 'cors'
+        }).then(res => {
+            alert('done');
+        }).catch(console.log)
     }
 
     const resetCurrentText = () => {
@@ -368,8 +395,7 @@ const Classification = () => {
                 color='primary'
                 variant='outlined'
                 onClick={() => {
-                    const data = `Action is an, originally Dutch, international discount store-chain, owned by the British private-equity fund 3i. It sells low budget, non-food and some food products with long shelf lives. Action operates stores in seven countries — Netherlands, Belgium, Germany, France, Austria, Luxembourg, Poland And Czech Republic.	action
-                    An adventure is an exciting experience that is typically bold, sometimes risky, undertaking. Adventures may be activities with some potential for physical danger such as traveling, exploring, skydiving, mountain climbing, scuba diving, river rafting or participating in extreme sports.	adventure`
+                    const data = `Action is an, originally Dutch, international discount store-chain, owned by the British private-equity fund 3i. It sells low budget, non-food and some food products with long shelf lives. Action operates stores in seven countries — Netherlands, Belgium, Germany, France, Austria, Luxembourg, Poland And Czech Republic.\t\taction\nAn adventure is an exciting experience that is typically bold, sometimes risky, undertaking. Adventures may be activities with some potential for physical danger such as traveling, exploring, skydiving, mountain climbing, scuba diving, river rafting or participating in extreme sports.\t\tadventure`
                     const url = URL.createObjectURL(new Blob([data], { type: 'text/tab-separated-values' }))
                     const link = document.createElement('a');
                     link.href = url;

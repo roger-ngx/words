@@ -170,14 +170,19 @@ const Annotation = () => {
             if(tag.annotation.includes('-B')){
 
                 startIndex = index;
-                const nextAnnotation = get(tags, `${index+1}.annotation`);
-                if(!nextAnnotation || !nextAnnotation.includes('-I')){
-                    endIndex = index;
-                }
+
+                let temp = index;
+                let nextAnnotation;
+                do{
+                    temp++;
+                    nextAnnotation = get(tags, `${temp+1}.annotation`);
+                }while(nextAnnotation && nextAnnotation.includes('-I'));
+
+                endIndex = temp-1;
             }
-            if(tag.annotation.includes('-I') && (index === size(tags) -1 || !includes(get(tags, `${index+1}.annotation`,'-I')))){
-                endIndex = index;
-            }
+            // if(tag.annotation.includes('-I') && (index === size(tags) -1 || !includes(get(tags, `${index+1}.annotation`,'-I')))){
+            //     endIndex = index;
+            // }
 
             if(startIndex>=0 && endIndex>=0){
                 console.log(startIndex, endIndex);
@@ -391,6 +396,8 @@ const Annotation = () => {
     }
 
     const processFileData = data => {
+        // console.log('annotation', data);
+
         const rows = data.split('\n');
         const _texts = [];
         const _annotations = [];
@@ -400,15 +407,15 @@ const Annotation = () => {
         // setCurrentText(currentText => null);
         // setCurrentAnnotation(currentAnnotation => null);
 
-        console.log('rows', rows);
+        // console.log('rows', rows);
         
-        for(let i = 0; i < rows.length; i++){
-            const row = rows[i].substring(1);
+        for(let i = 1; i < rows.length; i++){
+            const row = rows[i];
             const [text, annotation] = row.split('\t');
+            console.log(row.split('\t'));
             _texts.push(text);
             _annotations.push(annotation);
         }
-        console.log(_texts[0], _annotations[0]);
         
         setTexts(_texts);
         setAnnotations(_annotations);
@@ -441,11 +448,12 @@ const Annotation = () => {
 
         const data = new FormData();
         data.append('file', currentUploadFile);
+        data.append('projectName', 'default');
         data.append('type', 'annotation');
         data.append('fileName', fileName);
         data.append('username', currentUser)
 
-        fetch('/api/file/upload', {
+        fetch(API_SERVER_ADDRESS + '/api/file/upload', {
             method: 'POST',
             body: data
         }).then(res => {
@@ -467,10 +475,11 @@ const Annotation = () => {
         const data = new FormData();
         data.append('file', new Blob([tsv]));
         data.append('type', 'annotation');
+        data.append('projectName', 'default');
         data.append('fileName', selectedFileName);
         data.append('username', currentUser);
 
-        fetch('/api/file/upload', {
+        fetch(API_SERVER_ADDRESS + '/api/file/upload', {
             method: 'POST',
             body: data,
             mode: 'cors'

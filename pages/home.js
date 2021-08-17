@@ -54,7 +54,7 @@ const Home = () => {
                 <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
             </Head>
             <div style={{display: 'flex', flexDirection: 'row'}}>
-                <div>
+                <div style={{minWidth: 150}}>
                     <PageWithDrawer />
                 </div>
                 <div style={{flex: 1}}>
