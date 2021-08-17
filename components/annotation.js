@@ -225,6 +225,7 @@ const Annotation = () => {
         console.log('selection', selection);
         
         const startId = +selection.anchorNode.parentNode.id;
+        //firefox:focusNode, chrome:extentNode
         const endId = +(selection.extentNode || selection.focusNode).parentNode.id;
 
         console.log(startId, endId, isDbClick);
