@@ -210,14 +210,12 @@ function PageWithDrawer({window}) {
         </List>
       </div>
       <div style={{marginBottom: 10, textAlign: 'center'}}>
-        <label htmlFor='tsv_file_upload'>
-          <Button
-            button
-            variant='outlined'
-          >
-            Add Project
-          </Button>
-        </label>
+        <Button
+          button
+          variant='outlined'
+        >
+          Add Project
+        </Button>
       </div>
       <FilenameInputDialog
         open={openFileInput}
