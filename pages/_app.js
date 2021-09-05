@@ -5,12 +5,10 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { red } from '@material-ui/core/colors';
+import { Provider } from 'react-redux';
+import { useRouter } from 'next/router';
 
 import store from 'stores/store';
-import { Provider } from 'react-redux';
-import PageWithDrawer from 'components/PageWithDrawer';
-import { useRouter } from 'next/router';
-import { isEmpty } from 'lodash';
 
 //https://github.com/mui-org/material-ui/issues/15073
 // Create a theme instance.

@@ -12,7 +12,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 
-import AddNewClassDialog from './AddNewClassDialog';
+import AddNewClassDialog from '../dialogs/AddNewClassDialog';
 
 const CLASSIFICATIONS = [
     {

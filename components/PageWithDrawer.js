@@ -25,8 +25,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import { setFiles, addFile, setSelectedFileName, setSelectedProject } from 'stores/fileSlice';
 import { ListItemIcon, Button } from '@material-ui/core';
-import FilenameInputDialog from './FilenameInputDialog';
+import FilenameInputDialog from '../dialogs/FilenameInputDialog';
 import { API_SERVER_ADDRESS } from 'constants/defaults';
+import AddNewProjectDialog from 'dialogs/AddNewProjectDialog';
 
 
 const drawerWidth = 240;
@@ -75,19 +76,21 @@ function PageWithDrawer({window}) {
   const [openClassification, setOpenClassification] = useState(false);
 
   const userFiles = useSelector(state => get(state, 'files.projects.default', []));
-  const currentUser = useSelector(state => state.user.username);
+  const currentUser = useSelector(state => state.user.userInfo);
   const currentSelectedFile = useSelector(state => state.files.selectedFileName);
   const currentSelectedProject = useSelector(state => state.files.selectedProject);
 
   const [ openFileInput, setOpenFileInput ] = useState(false);
   const [ currentUploadFile, setCurrentUploadFile ] = useState([]);
 
+  const [ openProjectInput, setOpenProjectInput ] = useState(false);
+
   const dispatch = useDispatch();
   const router = useRouter();
 
   useEffect(() => {
     if(currentUser){
-      getUserFiles(currentUser);
+      getUserFiles(currentUser.username);
     }
   }, [currentUser]);
 
@@ -102,7 +105,7 @@ function PageWithDrawer({window}) {
       data.append('file', currentUploadFile);
       data.append('projectName', 'default');
       data.append('fileName', fileName);
-      data.append('username', currentUser);
+      data.append('username', currentUser.username);
 
       fetch(API_SERVER_ADDRESS+'/api/file/upload', {
           method: 'POST',
@@ -112,6 +115,30 @@ function PageWithDrawer({window}) {
           dispatch(addFile({project: 'default', file: fileName}));
       })
   }
+
+  const onFinishInputProjectName = projectName => {
+    setOpenProjectInput(false);
+
+    console.log('currentUser', currentUser);
+
+    const data = {
+      uid: currentUser.uid,
+      projectName
+    }
+
+    fetch(API_SERVER_ADDRESS+'/api/project/add', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+    }).then(res => {
+        // dispatch(addFile({project: 'default', file: fileName}));
+        console.log(res);
+    })
+}
 
   const fileUploadedHandle = e => {
     console.log(e.target.files);
@@ -145,7 +172,7 @@ function PageWithDrawer({window}) {
   const drawer = (
     <div style={{flex: 1, display: 'flex', flexDirection: 'column', width: '100%'}}>
       <div style={{padding: 16, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-        <div>Welcome <b>{currentUser}</b></div>
+        <div>Welcome <b>{currentUser.username}</b></div>
         <div
           style={{fontSize: 12, border: 'solid 1px #ddd', padding: '4px 8px', borderRadius: 20, cursor: 'pointer'}}
           onClick={() => {
@@ -214,6 +241,7 @@ function PageWithDrawer({window}) {
           <Button
             button
             variant='outlined'
+            onClick={() => setOpenProjectInput(true)}
           >
             Add Project
           </Button>
@@ -223,6 +251,11 @@ function PageWithDrawer({window}) {
         open={openFileInput}
         setOpen={setOpenFileInput}
         onFinish={onFinishInputFilename}
+      />
+      <AddNewProjectDialog
+        open={openProjectInput}
+        setOpen={setOpenProjectInput}
+        onFinish={onFinishInputProjectName}
       />
     </div>
   );

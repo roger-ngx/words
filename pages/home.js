@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import Head from 'next/head';
 import { isEmpty } from 'lodash';
 import Paper from '@material-ui/core/Paper';
@@ -10,19 +9,13 @@ import Annotation from 'components/annotation';
 import Classification from 'components/classification';
 import PageWithDrawer from 'components/PageWithDrawer';
 import { useRouter } from 'next/router';
-import { setUsername } from 'stores/userSlice';
-
 
 const Home = () => {
-
-    const dispatch = useDispatch();
 
     const [ currentComponent, setCurrentComponent ] = useState();
     const [ currentTab, setCurrentTab ] = useState(0);
 
     const router = useRouter();
-
-    const selectedType = useSelector(state => state.files.selectedType);
 
     useEffect(() => {
         const currentUser = (typeof window === undefined) ? '' : localStorage.getItem('currentUser');
@@ -31,8 +24,6 @@ const Home = () => {
             router.push('/');
             return;
         }
-
-        dispatch(setUsername(currentUser));
     }, []);
 
     useEffect(() => {

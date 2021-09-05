@@ -1,18 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Button, CircularProgress, FormControl, Input, InputAdornment, InputLabel, Paper } from '@material-ui/core'
 import { AccountCircle } from '@material-ui/icons'
-import Head from 'next/head'
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { isEmpty, trim } from 'lodash';
-import { API_SERVER_ADDRESS } from 'constants/defaults';
+import { useDispatch } from 'react-redux';
 
-export default function Home() {
+import { API_SERVER_ADDRESS } from 'constants/defaults';
+import { setCurrentUser } from 'stores/userSlice';
+
+export default function Login() {
 
   const [ username, setUsername ] = useState('');
   const [ error, setError ] = useState('');
   const [ loading, setLoading ] = useState(false);
 
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const onLogin = () => {
     setLoading(true);
@@ -26,6 +30,7 @@ export default function Home() {
     .then(data => {
       if(data.err === 0){
         localStorage.setItem('currentUser', username);
+        dispatch(setCurrentUser({username, uid: data.uid}));
         router.push('/home');
       } else {
         setError(data.message);
@@ -33,8 +38,8 @@ export default function Home() {
     }).finally(() => {
       setLoading(false);
     });
-  }
-  
+  };
+
   const onSignup = () => {
     setLoading(true);
 

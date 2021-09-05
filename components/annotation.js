@@ -12,7 +12,7 @@ import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import { useDispatch, useSelector } from 'react-redux';
 import { addFile } from 'stores/fileSlice';
 import { API_SERVER_ADDRESS } from 'constants/defaults';
-import AddNewAnnotationDialog from './AddNewAnnotationDialog';
+import AddNewAnnotationDialog from '../dialogs/AddNewAnnotationDialog';
 
 const HeaderTag = ({name, index, backgroundColor, color, onClick}) => {
 
