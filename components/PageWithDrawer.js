@@ -18,12 +18,12 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 
-import { get, map } from 'lodash';
+import { get, map, keys } from 'lodash';
 
 import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
-import { setFiles, addFile, setSelectedFileName, setSelectedProject } from 'stores/fileSlice';
+import { setFiles, addFile, setSelectedFileName, setSelectedProject, setProjects, addProject } from 'stores/fileSlice';
 import { ListItemIcon, Button } from '@material-ui/core';
 import FilenameInputDialog from '../dialogs/FilenameInputDialog';
 import { API_SERVER_ADDRESS } from 'constants/defaults';
@@ -75,10 +75,11 @@ function PageWithDrawer({window}) {
   const [openAnnotation, setOpenAnnotation] = useState(false);
   const [openClassification, setOpenClassification] = useState(false);
 
-  const userFiles = useSelector(state => get(state, 'files.projects.default', []));
+  const userProjects = useSelector(state => get(state, 'files.projects', []));
   const currentUser = useSelector(state => state.user.userInfo);
   const currentSelectedFile = useSelector(state => state.files.selectedFileName);
   const currentSelectedProject = useSelector(state => state.files.selectedProject);
+  const userFiles = get(userProjects, `${currentSelectedProject}`, []);
 
   const [ openFileInput, setOpenFileInput ] = useState(false);
   const [ currentUploadFile, setCurrentUploadFile ] = useState([]);
@@ -104,7 +105,7 @@ function PageWithDrawer({window}) {
 
       const data = new FormData();
       data.append('file', currentUploadFile);
-      data.append('projectName', 'default');
+      data.append('projectName', currentSelectedProject);
       data.append('fileName', fileName);
       data.append('username', currentUser.username);
 
@@ -113,7 +114,7 @@ function PageWithDrawer({window}) {
           body: data,
           mode: 'cors'
       }).then(res => {
-          dispatch(addFile({project: 'default', file: fileName}));
+          dispatch(addFile({project: currentSelectedProject, file: fileName}));
       })
   }
 
@@ -136,8 +137,7 @@ function PageWithDrawer({window}) {
           'Content-Type': 'application/json'
         },
     }).then(res => {
-        // dispatch(addFile({project: 'default', file: fileName}));
-        console.log(res);
+      res.name && dispatch(addProject({name: res.name}));
     })
   }
 
@@ -158,8 +158,9 @@ function PageWithDrawer({window}) {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-    }).then(res => res.json())
-    .then(console.log)
+    })
+    .then(res => res.json())
+    .then(res => res.names && dispatch(setProjects({names: res.names})))
   }
 
   const fileUploadedHandle = e => {
@@ -208,45 +209,52 @@ function PageWithDrawer({window}) {
       <Divider />
       <div style={{flex: 1}}>
         <List>
-            <ListItem
-              button
-              onClick={
-                () => dispatch(setSelectedProject(currentSelectedProject==='Default Project' ? '' : 'Default Project'))
-              }
-            >
-              <ListItemText button primary='Default Project' />
-              <ExpandMore />
-            </ListItem>
-            <Collapse in={currentSelectedProject==='Default Project'} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                {
-                  map(userFiles, file => (
+          {
+            map(keys(userProjects), project => (
+              <>
+                <ListItem
+                button
+                onClick={
+                  () => dispatch(setSelectedProject(currentSelectedProject===project ? '' : project))
+                }
+              >
+                <ListItemText button primary={project} />
+                <ExpandMore />
+              </ListItem>
+              <Collapse in={currentSelectedProject===project} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  {
+                    map(userFiles, file => (
+                      <ListItem
+                        key={file}
+                        button
+                        className={classes.nested}
+                        selected={currentSelectedFile===file}
+                        onClick={
+                          () => dispatch(setSelectedFileName(currentSelectedFile===file ? '' : file))
+                        }
+                      >
+                        <ListItemText primary={file} />
+                      </ListItem>
+                    ))
+                  }
+                  <label htmlFor='tsv_file_upload'>
                     <ListItem
-                      key={file}
                       button
                       className={classes.nested}
-                      selected={currentSelectedFile===file}
-                      onClick={
-                        () => dispatch(setSelectedFileName(currentSelectedFile===file ? '' : file))
-                      }
                     >
-                      <ListItemText primary={file} />
+                      <ListItemIcon>
+                        <AddCircleOutlineIcon />
+                      </ListItemIcon>
+                      <ListItemText primary='Add File' />
                     </ListItem>
-                  ))
-                }
-                <label htmlFor='tsv_file_upload'>
-                  <ListItem
-                    button
-                    className={classes.nested}
-                  >
-                    <ListItemIcon>
-                      <AddCircleOutlineIcon />
-                    </ListItemIcon>
-                    <ListItemText primary='Add File' />
-                  </ListItem>
-                </label>
-              </List>
-            </Collapse>
+                  </label>
+                  </List>
+                </Collapse>
+              </>
+            ))
+          }
+            
           <input
             style={{display: 'none', width: 0}}
             id='tsv_file_upload'

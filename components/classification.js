@@ -165,7 +165,8 @@ const Classification = () => {
 
     const selectedType = useSelector(state => state.files.selectedType);
     const selectedFileName = useSelector(state => state.files.selectedFileName);
-    const currentUser = useSelector(state => state.user.username);
+    const currentUser = useSelector(state => state.user.userInfo);
+    const selectedProject = useSelector(state => state.files.selectedProject);
 
     useEffect(() =>{
         const classifications = JSON.parse(localStorage.getItem('userDefineClassificationss'));
@@ -201,9 +202,9 @@ const Classification = () => {
 
     const getFile = (fileName) => {
         const data = {
-            projectName: 'default',
+            projectName: selectedProject,
             fileName,
-            username: currentUser,
+            username: currentUser.username,
         };
     
         fetch(API_SERVER_ADDRESS + '/api/file/read', {
