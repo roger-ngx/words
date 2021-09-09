@@ -8,7 +8,14 @@ import { red } from '@material-ui/core/colors';
 import { Provider } from 'react-redux';
 import { useRouter } from 'next/router';
 
+import {
+  persistStore,
+} from 'redux-persist'
+import { PersistGate } from 'redux-persist/integration/react'
+
 import store from 'stores/store';
+
+let persistor = persistStore(store)
 
 //https://github.com/mui-org/material-ui/issues/15073
 // Create a theme instance.
@@ -53,22 +60,24 @@ export default function MyApp(props) {
 
   return (
     <Provider store={store}>
-      <React.Fragment>
-        <Head>
-          <title>Words</title>
-          <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
-        </Head>
-        <ThemeProvider theme={theme}>
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-          <CssBaseline />
-          <div style={{display: 'flex', flexDirection: 'row'}}>
-            {/* <PageWithDrawer /> */}
-            <div style={{flex: 1}}>
-              <Component {...pageProps} />
+      <PersistGate loading={null} persistor={persistor}>
+        <React.Fragment>
+          <Head>
+            <title>Words</title>
+            <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
+          </Head>
+          <ThemeProvider theme={theme}>
+            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+            <CssBaseline />
+            <div style={{display: 'flex', flexDirection: 'row'}}>
+              {/* <PageWithDrawer /> */}
+              <div style={{flex: 1}}>
+                <Component {...pageProps} />
+              </div>
             </div>
-          </div>
-        </ThemeProvider>
-      </React.Fragment>
+          </ThemeProvider>
+        </React.Fragment>
+      </PersistGate>
     </Provider>
   );
 }

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { set, get } from 'lodash';
+import { set, get, forEach } from 'lodash';
 
 export const filesSlice = createSlice({
     name: 'files',
@@ -10,6 +10,17 @@ export const filesSlice = createSlice({
         selectedProject: 'default'
     },
     reducers: {
+        setProjects:  (state, action) => {
+            const { names } = action.payload;
+            const projects = {};
+            forEach(names, name => set(projects, `${name}`, []));
+            state.projects = projects;
+        },
+        addProject:  (state, action) => {
+            const { name } = action.payload;
+            const obj = set({}, `${name}`, []);
+            state.projects = {...state.projects, ...obj};
+        },
         setFiles: (state, action) => {
             const { project, files } = action.payload;
             const obj = set({}, `${project}`, files);
@@ -35,6 +46,6 @@ export const filesSlice = createSlice({
     }
 });
 
-export const { setFiles, addFile, setSelectedProject, setSelectedFileName, setSelectedType } = filesSlice.actions;
+export const { setFiles, addFile, setSelectedProject, setSelectedFileName, setSelectedType, setProjects, addProject } = filesSlice.actions;
 
 export default filesSlice.reducer;

@@ -91,6 +91,7 @@ function PageWithDrawer({window}) {
   useEffect(() => {
     if(currentUser){
       getUserFiles(currentUser.username);
+      loadProjects(currentUser.uid);
     }
   }, [currentUser]);
 
@@ -138,7 +139,28 @@ function PageWithDrawer({window}) {
         // dispatch(addFile({project: 'default', file: fileName}));
         console.log(res);
     })
-}
+  }
+
+  const loadProjects = () => {
+    setOpenProjectInput(false);
+
+    console.log('currentUser', currentUser);
+
+    const data = {
+      uid: currentUser.uid,
+    }
+
+    fetch(API_SERVER_ADDRESS+'/api/project/list', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+    }).then(res => res.json())
+    .then(console.log)
+  }
 
   const fileUploadedHandle = e => {
     console.log(e.target.files);
