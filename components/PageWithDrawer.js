@@ -219,7 +219,7 @@ function PageWithDrawer({window}) {
                 }
               >
                 <ListItemText button primary={project} />
-                <ExpandMore />
+                { currentSelectedProject===project ? <ExpandLess /> : <ExpandMore /> }
               </ListItem>
               <Collapse in={currentSelectedProject===project} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
@@ -260,7 +260,7 @@ function PageWithDrawer({window}) {
             id='tsv_file_upload'
             multiple
             type='file'
-            accept='.tsv'
+            accept='.tsv, .txt'
             onChange={fileUploadedHandle}
             onClick={e => e.target.value = null}
           />

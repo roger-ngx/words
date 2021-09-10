@@ -143,12 +143,13 @@ const Annotation = () => {
     useEffect(() => {
         if(isEmpty(currentText)) return;
 
-        // console.log('wtf ', currentText, currentAnnotation);
+        // console.log('wtf ', split(currentText, ' '));
+        const annotations = currentAnnotation ? split(currentAnnotation,' ') : [];
 
         setTags(map(split(currentText, ' '), (txt, index) => ({
             id: index,
             content: txt,
-            annotation: get(split(currentAnnotation,' '), `${index}`, 'O'),
+            annotation: get(annotations, `${index}`, 'O'),
             component: <span key={index} style={{display:'inline-block', lineHeight: 2}} id={index}>{txt}&nbsp;</span>
         })));
 
@@ -411,7 +412,7 @@ const Annotation = () => {
 
         // console.log('rows', rows);
         
-        for(let i = 1; i < rows.length; i++){
+        for(let i = 0; i < rows.length; i++){
             const row = rows[i];
             const [text, annotation] = row.split('\t');
             console.log(row.split('\t'));
