@@ -18,7 +18,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 
-import { get, map, keys } from 'lodash';
+import { get, map, keys, isEmpty } from 'lodash';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -91,10 +91,15 @@ function PageWithDrawer({window}) {
 
   useEffect(() => {
     if(currentUser){
-      getUserFiles(currentUser.username);
       loadProjects(currentUser.uid);
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    if(!isEmpty(currentSelectedProject)){
+      getUserFiles(currentUser.username);
+    }
+  }, [currentSelectedProject]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -174,7 +179,7 @@ function PageWithDrawer({window}) {
   const getUserFiles = (username) => {
     const data = {
       username,
-      projectName: 'default'
+      projectName: currentSelectedProject
     };
 
     console.log('data', data);
@@ -189,7 +194,7 @@ function PageWithDrawer({window}) {
       body: JSON.stringify(data)
     })
     .then(res => res.json())
-    .then(({files}) => dispatch(setFiles({project: 'default', files})));
+    .then(({files}) => dispatch(setFiles({project: currentSelectedProject, files})));
   };
 
   const drawer = (

@@ -285,9 +285,9 @@ const Classification = () => {
         const data = new FormData();
         data.append('file', new Blob([tsv]));
         data.append('type', 'classification');
-        data.append('projectName', 'default');
+        data.append('projectName', selectedProject);
         data.append('fileName', selectedFileName);
-        data.append('username', currentUser);
+        data.append('username', currentUser.username);
 
         fetch(API_SERVER_ADDRESS + '/api/file/upload', {
             method: 'POST',

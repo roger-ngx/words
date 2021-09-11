@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent, Paper, Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@material-ui/core';
-import { split, map, isEmpty, forEach, findIndex, slice, range, remove, intersection, includes, join, size, get } from 'lodash';
+import { split, map, isEmpty, forEach, findIndex, slice, range, remove, intersection, includes, join, size, get, compact } from 'lodash';
 
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
@@ -399,9 +399,9 @@ const Annotation = () => {
     }
 
     const processFileData = data => {
-        // console.log('annotation', data);
+        console.log('annotation', data);
 
-        const rows = data.split('\n');
+        const rows = compact(data.split('\n'));
         const _texts = [];
         const _annotations = [];
 
@@ -454,7 +454,7 @@ const Annotation = () => {
         data.append('projectName', selectedProject);
         data.append('type', 'annotation');
         data.append('fileName', fileName);
-        data.append('username', currentUser)
+        data.append('username', currentUser.username)
 
         fetch(API_SERVER_ADDRESS + '/api/file/upload', {
             method: 'POST',
@@ -478,9 +478,9 @@ const Annotation = () => {
         const data = new FormData();
         data.append('file', new Blob([tsv]));
         data.append('type', 'annotation');
-        data.append('projectName', 'default');
+        data.append('projectName', selectedProject);
         data.append('fileName', selectedFileName);
-        data.append('username', currentUser);
+        data.append('username', currentUser.username);
 
         fetch(API_SERVER_ADDRESS + '/api/file/upload', {
             method: 'POST',
