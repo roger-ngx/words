@@ -60,7 +60,7 @@ export default function Login() {
     }).finally(() => {
       setLoading(false);
     });
-  }
+  };
 
   useEffect(() => {
     if(localStorage.getItem('currentUser')){

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Paper, Button, IconButton, Radio, Typography } from '@material-ui/core';
-import { map, isEmpty, size } from 'lodash';
+import { map, isEmpty, size, forEach } from 'lodash';
 import { useSelector } from 'react-redux';
 import { API_SERVER_ADDRESS } from 'constants/defaults';
 
@@ -349,7 +349,7 @@ const Classification = () => {
                                 value={value}
                                 check={selectedClass===value}
                                 onChange={setSelectedClass}
-                                onDeleteClass={onDeleteClass}
+                                onDeleteClass={() => onDeleteClass(index)}
                             />
                         )
                     )

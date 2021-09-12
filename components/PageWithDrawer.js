@@ -141,8 +141,10 @@ function PageWithDrawer({window}) {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-    }).then(res => {
-      res.name && dispatch(addProject({name: res.name}));
+    })
+    .then(res => res.json())
+    .then(data => {
+      data.name && dispatch(addProject({name: data.name}));
     })
   }
 

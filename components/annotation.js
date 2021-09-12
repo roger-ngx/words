@@ -180,7 +180,7 @@ const Annotation = () => {
                     nextAnnotation = get(tags, `${temp+1}.annotation`);
                 }while(nextAnnotation && nextAnnotation.includes('-I'));
 
-                endIndex = temp-1;
+                endIndex = temp;
             }
             // if(tag.annotation.includes('-I') && (index === size(tags) -1 || !includes(get(tags, `${index+1}.annotation`,'-I')))){
             //     endIndex = index;
