@@ -18,7 +18,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 
-import { get, map, keys, isEmpty } from 'lodash';
+import { get, map, keys, isEmpty, includes } from 'lodash';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -108,6 +108,11 @@ function PageWithDrawer({window}) {
   const onFinishInputFilename = fileName => {
       setOpenFileInput(false);
 
+      if(isEmpty(trim(fileName))){
+        alert('file name cannot be empty');
+        return;
+      }
+
       const data = new FormData();
       data.append('file', currentUploadFile);
       data.append('projectName', currentSelectedProject);
@@ -126,7 +131,17 @@ function PageWithDrawer({window}) {
   const onFinishInputProjectName = projectName => {
     setOpenProjectInput(false);
 
-    console.log('currentUser', currentUser);
+    // console.log('currentUser', currentUser);
+
+    if(isEmpty(trim(projectName))){
+      alert('project name cannot be empty');
+      return;
+    }
+
+    if(includes(keys(userProjects), projectName)){
+      alert('project has already existed');
+      return;
+    }
 
     const data = {
       uid: currentUser.uid,

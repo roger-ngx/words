@@ -7,6 +7,11 @@ const FilenameInputDialog = ({open, setOpen, onFinish}) => {
 
     const onFileNameChange = e => setFileName(e.target.value);
 
+    const onFinishInput = () => {
+        onFinish(fileName + '.tsv');
+        setFileName('');
+    }
+
     return (
         <Dialog open={open} onClose={() => setOpen(false)}>
             <DialogTitle>
@@ -28,7 +33,7 @@ const FilenameInputDialog = ({open, setOpen, onFinish}) => {
                     disabled={isEmpty(fileName)}
                     color='primary'
                     variant='outlined'
-                    onClick={() => onFinish(fileName + '.tsv')}
+                    onClick={onFinishInput}
                 >
                     Add
                 </Button>

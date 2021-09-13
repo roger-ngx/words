@@ -9,6 +9,7 @@ const AddNewProjectDialog = ({open, setOpen, onFinish}) => {
     const addNewProject = () => {
         setVerified(true);
         !isEmpty(projectName) && onFinish(projectName);
+        setProjectName('');
     };
 
     const onProjectNameChange = e => setProjectName(e.target.value);
