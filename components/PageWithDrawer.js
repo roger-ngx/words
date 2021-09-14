@@ -18,12 +18,12 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 
-import { get, map, keys, isEmpty, includes } from 'lodash';
+import { get, map, keys, isEmpty, includes, trim } from 'lodash';
 
 import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
-import { setFiles, addFile, setSelectedFileName, setSelectedProject, setProjects, addProject, trim } from 'stores/fileSlice';
+import { setFiles, addFile, setSelectedFileName, setSelectedProject, setProjects, addProject } from 'stores/fileSlice';
 import { ListItemIcon, Button } from '@material-ui/core';
 import FilenameInputDialog from '../dialogs/FilenameInputDialog';
 import { API_SERVER_ADDRESS } from 'constants/defaults';
