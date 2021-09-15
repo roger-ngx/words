@@ -607,7 +607,7 @@ const Annotation = () => {
                 alignItems: 'center'
             }}
         >
-            <Button
+            {/* <Button
                 color='primary'
                 variant='outlined'
                 onClick={() => {
@@ -620,7 +620,7 @@ const Annotation = () => {
                 }}
             >
                 Template
-            </Button>
+            </Button> */}
             <IconButton onClick={saveCurrentText}>
                 <CheckIcon style={{color:'green'}}/>
             </IconButton>

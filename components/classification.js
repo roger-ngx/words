@@ -392,7 +392,7 @@ const Classification = () => {
                 alignItems: 'center'
             }}
         >
-            <Button
+            {/* <Button
                 color='primary'
                 variant='outlined'
                 onClick={() => {
@@ -405,7 +405,7 @@ const Classification = () => {
                 }}
             >
                 Template
-            </Button>
+            </Button> */}
             <IconButton onClick={saveCurrentText}>
                 <CheckIcon style={{color:'green'}}/>
             </IconButton>
