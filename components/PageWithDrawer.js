@@ -18,7 +18,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 
-import { get, map, keys, isEmpty, includes, trim } from 'lodash';
+import { get, map, keys, isEmpty, includes, trim, filter } from 'lodash';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -28,6 +28,7 @@ import { ListItemIcon, Button } from '@material-ui/core';
 import FilenameInputDialog from '../dialogs/FilenameInputDialog';
 import { API_SERVER_ADDRESS } from 'constants/defaults';
 import AddNewProjectDialog from 'dialogs/AddNewProjectDialog';
+import SearchInput from './SearchInput';
 
 
 const drawerWidth = 240;
@@ -74,6 +75,8 @@ function PageWithDrawer({window}) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openAnnotation, setOpenAnnotation] = useState(false);
   const [openClassification, setOpenClassification] = useState(false);
+  const [ projectNames, setProjectNames ] = useState([]);
+  const [ projectSearchText, setProjectSearchText ] = useState([]);
 
   const userProjects = useSelector(state => get(state, 'files.projects', []));
   const currentUser = useSelector(state => state.user.userInfo);
@@ -94,6 +97,15 @@ function PageWithDrawer({window}) {
       loadProjects(currentUser.uid);
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    setProjectNames(keys(userProjects));
+  }, [userProjects]);
+
+  useEffect(() => {
+    const names = filter(keys(userProjects), name => includes(name, projectSearchText));
+    setProjectNames(names)
+  }, [projectSearchText]);
 
   useEffect(() => {
     if(!isEmpty(currentSelectedProject)){
@@ -138,7 +150,7 @@ function PageWithDrawer({window}) {
       return;
     }
 
-    if(includes(keys(userProjects), projectName)){
+    if(includes(projectNames, projectName)){
       alert('project has already existed');
       return;
     }
@@ -230,9 +242,14 @@ function PageWithDrawer({window}) {
       </div>
       <Divider />
       <div style={{flex: 1}}>
+        <div style={{margin: '10px 10px 0'}}>
+          <SearchInput
+            onClick={setProjectSearchText}
+          />
+        </div>
         <List>
           {
-            map(keys(userProjects), project => (
+            map(projectNames, project => (
               <>
                 <ListItem
                 button
