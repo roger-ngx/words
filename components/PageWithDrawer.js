@@ -171,7 +171,13 @@ function PageWithDrawer({window}) {
     })
     .then(res => res.json())
     .then(data => {
-      data.name && dispatch(addProject({name: data.name}));
+      const { err, message } = data;
+      if(err === 0){
+        const ret = JSON.parse(message);
+        ret.name && dispatch(addProject({name: ret.name}));
+      }else{
+        alert(`[err:${err}]failed to add a new project`);
+      }
     })
   }
 
