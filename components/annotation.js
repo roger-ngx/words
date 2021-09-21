@@ -541,7 +541,7 @@ const Annotation = () => {
     }
 
     return (<div
-        style={{outline: 'none', height: 'calc(100vh - 32px)', position: 'relative'}}
+        style={{outline: 'none', position: 'relative'}}
         tabIndex="0"
         onKeyDown={e => {
             const { keyCode } = e;
@@ -551,29 +551,31 @@ const Annotation = () => {
             }
         }}
     >
-        <Paper style={{width: '80%', margin: 'auto'}} elevation={2}>
-            <div
-                style={{backgroundColor: '#583fcf', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', padding: 16}}
-            >
-                {
-                    map(userDefineAnnotations, (annotation, index) => (
-                        <HeaderTag
-                            name={annotation.code}
-                            index={index}
-                            backgroundColor={annotationType === annotation.code ? 'white' : '#583fcf'}
-                            color={annotationType === annotation.code ? '#583fcf' : 'white'}
-                            onClick={() => setAnnotationType(annotation.code)}
-                        />
-                    ))
-                }
-                <IconButton style={{color: 'white'}} onClick={() => setOpenAnnotationInput(true)}>
-                    <AddCircleOutlineIcon />
-                </IconButton>
-                <AddNewAnnotationDialog
-                    open={openAnnotationInput}
-                    setOpen={setOpenAnnotationInput}
-                    onAddNewAnnotation={onAddNewAnnotation}
-                />
+        <Paper style={{width: '80%', margin: 'auto', marginBottom: 100}} elevation={2}>
+            <div style={{position: 'sticky', top: 48, zIndex: 1000}}>
+                <div
+                    style={{backgroundColor: '#583fcf', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', padding: 16}}
+                >
+                    {
+                        map(userDefineAnnotations, (annotation, index) => (
+                            <HeaderTag
+                                name={annotation.code}
+                                index={index}
+                                backgroundColor={annotationType === annotation.code ? 'white' : '#583fcf'}
+                                color={annotationType === annotation.code ? '#583fcf' : 'white'}
+                                onClick={() => setAnnotationType(annotation.code)}
+                            />
+                        ))
+                    }
+                    <IconButton style={{color: 'white'}} onClick={() => setOpenAnnotationInput(true)}>
+                        <AddCircleOutlineIcon />
+                    </IconButton>
+                    <AddNewAnnotationDialog
+                        open={openAnnotationInput}
+                        setOpen={setOpenAnnotationInput}
+                        onAddNewAnnotation={onAddNewAnnotation}
+                    />
+                </div>
             </div>
 
             {

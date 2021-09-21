@@ -327,6 +327,8 @@ const Classification = () => {
         >
             <Paper
                 style={{
+                    display: 'flex',
+                    flexDirection: 'row',
                     width: '80%',
                     padding: 24,
                     height: '100%',
@@ -335,39 +337,50 @@ const Classification = () => {
                 }}
                 elevation={2}
             >
-                <p style={{textAlign: 'justify'}}>
+                <p
+                    style={{
+                        textAlign: 'justify',
+                        flex: 3,
+                        marginRight: 20,
+                        // borderRightWidth: 1,
+                        // borderRightColor: '#666',
+                        // borderRightStyle: 'inherit'
+                    }}
+                >
                     {currentText}
                 </p>
-                {
-                    map(
-                        classifications,
-                        ({name, value}, index) => (
-                            <ClassificationSelection
-                                key={value}
-                                index={index}
-                                label={name}
-                                value={value}
-                                check={selectedClass===value}
-                                onChange={setSelectedClass}
-                                onDeleteClass={() => onDeleteClass(index)}
-                            />
+                <div style={{flex: 1}}>
+                    {
+                        map(
+                            classifications,
+                            ({name, value}, index) => (
+                                <ClassificationSelection
+                                    key={value}
+                                    index={index}
+                                    label={name}
+                                    value={value}
+                                    check={selectedClass===value}
+                                    onChange={setSelectedClass}
+                                    onDeleteClass={() => onDeleteClass(index)}
+                                />
+                            )
                         )
-                    )
-                }
-                <div
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        cursor: 'pointer',
-                        border: 'solid 1px #ddd',
-                        borderRadius: 4,
-                        alignItems: 'center',
-                        padding: 10
-                    }}
-                    onClick={() => setOpenClassInput(true)}
-                >
-                    <AddCircleOutlineIcon style={{color: 'rgba(0, 0, 0, 0.54)', marginRight: 8}}/>
-                    <Typography>Add a new class</Typography>
+                    }
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            cursor: 'pointer',
+                            border: 'solid 1px #ddd',
+                            borderRadius: 4,
+                            alignItems: 'center',
+                            padding: 10
+                        }}
+                        onClick={() => setOpenClassInput(true)}
+                    >
+                        <AddCircleOutlineIcon style={{color: 'rgba(0, 0, 0, 0.54)', marginRight: 8}}/>
+                        <Typography>Add a new class</Typography>
+                    </div>
                 </div>
             </Paper>
             {

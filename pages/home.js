@@ -49,7 +49,7 @@ const Home = () => {
                     <PageWithDrawer />
                 </div>
                 <div style={{flex: 1}}>
-                    <Paper square>
+                    <Paper square style={{position: 'sticky', top: 0, width: '100%', zIndex: 1000}}>
                         <Tabs
                             value={currentTab}
                             indicatorColor="primary"

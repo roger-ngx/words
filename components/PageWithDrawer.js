@@ -9,14 +9,13 @@ import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import MenuIcon from '@material-ui/icons/Menu';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 import { get, map, keys, isEmpty, includes, trim, filter } from 'lodash';
 
@@ -280,6 +279,11 @@ function PageWithDrawer({window}) {
                         }
                       >
                         <ListItemText primary={file} />
+                        <ListItemSecondaryAction>
+                          <IconButton edge="end" aria-label="delete">
+                            <DeleteIcon />
+                          </IconButton>
+                        </ListItemSecondaryAction>
                       </ListItem>
                     ))
                   }
@@ -294,6 +298,15 @@ function PageWithDrawer({window}) {
                       <ListItemText primary='Add File' />
                     </ListItem>
                   </label>
+                  <ListItem
+                      button
+                      className={classes.nested}
+                    >
+                      <ListItemIcon>
+                        <DeleteIcon />
+                      </ListItemIcon>
+                      <ListItemText primary='Delete project' />
+                    </ListItem>
                   </List>
                 </Collapse>
               </>
