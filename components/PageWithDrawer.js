@@ -17,7 +17,7 @@ import Collapse from '@material-ui/core/Collapse';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-import { get, map, keys, isEmpty, includes, trim, filter } from 'lodash';
+import { get, map, keys, isEmpty, includes, trim, filter, throttle } from 'lodash';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -92,10 +92,10 @@ function PageWithDrawer({window}) {
   const router = useRouter();
 
   useEffect(() => {
-    if(currentUser){
+    if(currentUser.uid){
       loadProjects(currentUser.uid);
     }
-  }, [currentUser]);
+  }, [currentUser.uid]);
 
   useEffect(() => {
     setProjectNames(keys(userProjects));
@@ -202,6 +202,62 @@ function PageWithDrawer({window}) {
     .then(res => res.names && dispatch(setProjects({names: res.names})))
   }
 
+  const deleteProject = (projectName) => {
+    setOpenProjectInput(false);
+
+    const { uid, username } = currentUser;
+
+    const data = {
+      uid,
+      username,
+      projectName
+    }
+
+    console.log(currentUser);
+
+    fetch(API_SERVER_ADDRESS+'/api/project/delete', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+    })
+    .then(res => res.json())
+    .then(res => res.name && dispatch(deleteProject({name: res.name})))
+  }
+
+  const deleteFile = ({projectName, fileName}) => {
+    setOpenProjectInput(false);
+
+    const { uid, username } = currentUser;
+
+    const data = {
+      username,
+      projectName,
+      fileName
+    }
+
+    console.log(currentUser);
+
+    fetch(API_SERVER_ADDRESS+'/api/file/delete', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+    })
+    .then(res => res.json())
+    .then(console.log)
+    // .then(res => {
+    //   const { projectName, fileName } = res;
+    //   projectName && fileName && dispatch(deleteProject({projectName, fileName}))
+    // })
+  }
+
   const fileUploadedHandle = e => {
     console.log(e.target.files);
     const file = e.target.files[0];
@@ -280,7 +336,10 @@ function PageWithDrawer({window}) {
                       >
                         <ListItemText primary={file} />
                         <ListItemSecondaryAction>
-                          <IconButton edge="end" aria-label="delete">
+                          <IconButton
+                            edge="end" aria-label="delete"
+                            onClick={throttle(() => deleteFile({projectName: project, fileName: file}), 2000, {trailing: false})}
+                          >
                             <DeleteIcon />
                           </IconButton>
                         </ListItemSecondaryAction>
@@ -301,6 +360,7 @@ function PageWithDrawer({window}) {
                   <ListItem
                       button
                       className={classes.nested}
+                      onClick={throttle(() => deleteProject(project), 2000, {trailing: false})}
                     >
                       <ListItemIcon>
                         <DeleteIcon />

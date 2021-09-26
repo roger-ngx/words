@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { set, get, forEach } from 'lodash';
+import { set, get, forEach, filter } from 'lodash';
 
 export const filesSlice = createSlice({
     name: 'files',
@@ -14,9 +14,14 @@ export const filesSlice = createSlice({
             const { names } = action.payload;
             const projects = {};
             forEach(names, name => set(projects, `${name}`, []));
-            state.projects = {...projects, ...state.projects};
+            state.projects = {...projects};
         },
         addProject:  (state, action) => {
+            const { name } = action.payload;
+            delete(state.projects[`${name}`]);
+            state.projects = {...state.projects};
+        },
+        deleteProject:  (state, action) => {
             const { name } = action.payload;
             const obj = set({}, `${name}`, []);
             state.projects = {...state.projects, ...obj};
@@ -34,6 +39,15 @@ export const filesSlice = createSlice({
             const files = get(state.projects, `${project}`, []);
 
             set(state.projects, `${project}`, [...files, file]);
+        },
+        deleteFile:  (state, action) => {
+            const { projectName, fileName } = action.payload;
+            const projectFiles = get(state.projects, `${projectName}`, []);
+
+            const files = filter(projectFiles, file => file !==fileName);
+
+            set(state.projects, `${projectName}`, [...files]);
+            state.projects = {...state.projects};
         },
         setSelectedProject: (state, action) => {
             state.selectedProject = action.payload;
