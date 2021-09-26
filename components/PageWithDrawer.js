@@ -17,7 +17,7 @@ import Collapse from '@material-ui/core/Collapse';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-import { get, map, keys, isEmpty, includes, trim, filter, throttle } from 'lodash';
+import { get, map, keys, isEmpty, includes, trim, filter, throttle, size, findIndex } from 'lodash';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -98,19 +98,40 @@ function PageWithDrawer({window}) {
   }, [currentUser.uid]);
 
   useEffect(() => {
-    setProjectNames(keys(userProjects));
+    const _projectNames = keys(userProjects);
+    if(compareArray(projectNames, _projectNames)){
+      return;
+    }
+
+    setProjectNames(_projectNames);
+
+    if(!isEmpty(currentSelectedProject) && includes(_projectNames, currentSelectedProject)){
+      getUserFiles(currentUser.username);
+    }
   }, [userProjects]);
 
   useEffect(() => {
-    const names = filter(keys(userProjects), name => includes(name, projectSearchText));
+    const names = filter(projectNames, name => includes(name, projectSearchText));
     setProjectNames(names)
   }, [projectSearchText]);
 
-  useEffect(() => {
-    if(!isEmpty(currentSelectedProject)){
-      getUserFiles(currentUser.username);
+  const compareArray = (a, b) => {
+    if(size(a)==0 || size(b)==0){
+      return false;
     }
-  }, [currentSelectedProject]);
+
+    if(size(a) !== size(b)){
+      return false;
+    }
+
+    return findIndex(a, item => !includes(b, item)) < 0;
+  }
+
+  // useEffect(() => {
+  //   if(!isEmpty(currentSelectedProject)){
+  //     getUserFiles(currentUser.username);
+  //   }
+  // }, [currentSelectedProject]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);

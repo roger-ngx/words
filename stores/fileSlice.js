@@ -29,9 +29,9 @@ export const filesSlice = createSlice({
         setFiles: (state, action) => {
             const { project, files } = action.payload;
             const obj = set({}, `${project}`, [...files]);
-            console.log('setFiles', obj);
+            // console.log('setFiles', obj);
             state.projects = {...state.projects, ...obj};
-            console.log('setFiles', state.projects);
+            // console.log('setFiles', state.projects);
         },
         addFile: (state, action) => {
             const { project, file } = action.payload;
