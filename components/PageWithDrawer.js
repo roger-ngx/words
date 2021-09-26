@@ -254,7 +254,7 @@ function PageWithDrawer({window}) {
     // .then(console.log)
     .then(res => {
       const { projectName, fileName } = res;
-      projectName && fileName && dispatch(deleteProject({projectName, fileName}))
+      projectName && fileName && dispatch(deleteFile({projectName, fileName}))
     })
   }
 
