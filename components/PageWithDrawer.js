@@ -72,15 +72,14 @@ function PageWithDrawer({window}) {
   const theme = useTheme();
   const classes = useStyles(theme);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [openAnnotation, setOpenAnnotation] = useState(false);
-  const [openClassification, setOpenClassification] = useState(false);
   const [ projectNames, setProjectNames ] = useState([]);
   const [ projectSearchText, setProjectSearchText ] = useState([]);
+  const [currentSelectedProject, setCurrentSelectedProject] = useState();
 
   const userProjects = useSelector(state => get(state, 'files.projects', []));
   const currentUser = useSelector(state => state.user.userInfo);
   const currentSelectedFile = useSelector(state => state.files.selectedFileName);
-  const currentSelectedProject = useSelector(state => state.files.selectedProject);
+  // const currentSelectedProject = useSelector(state => state.files.selectedProject);
   const userFiles = get(userProjects, `${currentSelectedProject}`, []);
 
   const [ openFileInput, setOpenFileInput ] = useState(false);
@@ -103,11 +102,13 @@ function PageWithDrawer({window}) {
       return;
     }
 
+    console.log(projectNames, _projectNames)
+
     setProjectNames(_projectNames);
 
-    if(!isEmpty(currentSelectedProject) && includes(_projectNames, currentSelectedProject)){
-      getUserFiles(currentUser.username);
-    }
+    // if(!isEmpty(currentSelectedProject) && includes(_projectNames, currentSelectedProject)){
+    //   getUserFiles(currentUser.username);
+    // }
   }, [userProjects]);
 
   useEffect(() => {
@@ -127,11 +128,11 @@ function PageWithDrawer({window}) {
     return findIndex(a, item => !includes(b, item)) < 0;
   }
 
-  // useEffect(() => {
-  //   if(!isEmpty(currentSelectedProject)){
-  //     getUserFiles(currentUser.username);
-  //   }
-  // }, [currentSelectedProject]);
+  useEffect(() => {
+    if(!isEmpty(currentSelectedProject)){
+      getUserFiles(currentUser.username);
+    }
+  }, [currentSelectedProject]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -336,7 +337,10 @@ function PageWithDrawer({window}) {
                 <ListItem
                 button
                 onClick={
-                  () => dispatch(setSelectedProject(currentSelectedProject===project ? '' : project))
+                  () => {
+                    setCurrentSelectedProject(currentSelectedProject===project ? '' : project);
+                    dispatch(setSelectedProject(currentSelectedProject===project ? '' : project));
+                  }
                 }
               >
                 <ListItemText button primary={project} />
