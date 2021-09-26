@@ -251,11 +251,11 @@ function PageWithDrawer({window}) {
         },
     })
     .then(res => res.json())
-    .then(console.log)
-    // .then(res => {
-    //   const { projectName, fileName } = res;
-    //   projectName && fileName && dispatch(deleteProject({projectName, fileName}))
-    // })
+    // .then(console.log)
+    .then(res => {
+      const { projectName, fileName } = res;
+      projectName && fileName && dispatch(deleteProject({projectName, fileName}))
+    })
   }
 
   const fileUploadedHandle = e => {
