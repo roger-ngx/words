@@ -22,7 +22,7 @@ import { get, map, keys, isEmpty, includes, trim, filter, throttle, size, findIn
 import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
-import { setFiles, addFile, setSelectedFileName, setSelectedProject, setProjects, addProject } from 'stores/fileSlice';
+import { setFiles, addFile, setSelectedFileName, setSelectedProject, setProjects, addProject, deleteProject, deleteFile } from 'stores/fileSlice';
 import { ListItemIcon, Button } from '@material-ui/core';
 import FilenameInputDialog from '../dialogs/FilenameInputDialog';
 import { API_SERVER_ADDRESS } from 'constants/defaults';
@@ -224,7 +224,7 @@ function PageWithDrawer({window}) {
     .then(res => res.names && dispatch(setProjects({names: res.names})))
   }
 
-  const deleteProject = (projectName) => {
+  const requestToDeleteProject = (projectName) => {
     setOpenProjectInput(false);
 
     const { uid, username } = currentUser;
@@ -250,7 +250,7 @@ function PageWithDrawer({window}) {
     .then(res => res.name && dispatch(deleteProject({name: res.name})))
   }
 
-  const deleteFile = ({projectName, fileName}) => {
+  const requestToDeleteFile = ({projectName, fileName}) => {
     setOpenProjectInput(false);
 
     const { uid, username } = currentUser;
@@ -363,7 +363,7 @@ function PageWithDrawer({window}) {
                         <ListItemSecondaryAction>
                           <IconButton
                             edge="end" aria-label="delete"
-                            onClick={throttle(() => deleteFile({projectName: project, fileName: file}), 2000, {trailing: false})}
+                            onClick={throttle(() => requestToDeleteFile({projectName: project, fileName: file}), 2000, {trailing: false})}
                           >
                             <DeleteIcon />
                           </IconButton>
@@ -385,7 +385,7 @@ function PageWithDrawer({window}) {
                   <ListItem
                       button
                       className={classes.nested}
-                      onClick={throttle(() => deleteProject(project), 2000, {trailing: false})}
+                      onClick={throttle(() => requestToDeleteProject(project), 2000, {trailing: false})}
                     >
                       <ListItemIcon>
                         <DeleteIcon />

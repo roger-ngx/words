@@ -23,8 +23,8 @@ export const filesSlice = createSlice({
         },
         deleteProject:  (state, action) => {
             const { name } = action.payload;
-            const obj = set({}, `${name}`, []);
-            state.projects = {...state.projects, ...obj};
+            delete(state.projects, `${name}`);
+            state.projects = {...state.projects};
         },
         setFiles: (state, action) => {
             const { project, files } = action.payload;
@@ -61,6 +61,11 @@ export const filesSlice = createSlice({
     }
 });
 
-export const { setFiles, addFile, setSelectedProject, setSelectedFileName, setSelectedType, setProjects, addProject } = filesSlice.actions;
+export const { 
+    setFiles, addFile,
+    setSelectedProject, setSelectedFileName,
+    setSelectedType, setProjects, addProject,
+    deleteProject, deleteFile
+} = filesSlice.actions;
 
 export default filesSlice.reducer;
