@@ -71,6 +71,8 @@ const Annotation = () => {
 
     const [currentText, setCurrentText] = useState(null);
     const [currentAnnotation, setCurrentAnnotation] = useState(null);
+
+    const [classifications, setClassifications] = useState([]);
     
     const [words, setWords] = useState([]);
 
@@ -411,14 +413,20 @@ const Annotation = () => {
         // setCurrentAnnotation(currentAnnotation => null);
 
         // console.log('rows', rows);
+
+        const tempClassifications = [];
         
         for(let i = 0; i < rows.length; i++){
             const row = rows[i];
-            const [text, annotation] = row.split('\t');
+            const [text, annotation, classification] = row.split('\t');
+
+            tempClassifications.push(classification);
             console.log(row.split('\t'));
             _texts.push(text);
             _annotations.push(annotation);
         }
+
+        setClassifications(tempClassifications);
         
         setTexts(_texts);
         setAnnotations(_annotations);
@@ -472,7 +480,7 @@ const Annotation = () => {
         var tsv = '';
 
         forEach(texts, (text, index) => {
-            tsv += `\n${text}\t${annotations[index]}`;
+            tsv += `\n${text}\t${annotations[index]}\t${classifications[index]}`;
         })
 
         const data = new FormData();

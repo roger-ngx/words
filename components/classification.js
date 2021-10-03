@@ -154,6 +154,8 @@ const ClassificationSelection = ({index, label, value, check=false, onChange, on
 const Classification = () => {
 
     const [classifications, setClassifications] = useState(CLASSIFICATIONS);
+    const [annotations, setAnnotations] = useState([]);
+
     const [openClassInput, setOpenClassInput] = useState(false);
     const [texts, setTexts] = useState([]);
     const [classes, setClasses] = useState([]);
@@ -221,15 +223,20 @@ const Classification = () => {
     const processFileData = (data) => {
         // console.log('classification', data);
         const _texts = [], _classes = [];
+        const tempAnnotations = [];
 
         map(data.split('\n'), row => {
             const [ text, annotation, className ] = row.split('\t');
+            tempAnnotations.push(annotation);
+
             console.log('className', className);
             if(!isEmpty(text)){
                 _texts.push(text);
                 _classes.push(className);
             }
         });
+
+        setAnnotations(tempAnnotations);
 
         // console.log('texts', _texts);
         // console.log('classes', _classes);
@@ -279,7 +286,7 @@ const Classification = () => {
         var tsv = '';
 
         forEach(texts, (text, index) => {
-            tsv += `\n${text}\t\t${classes[index]}`;
+            tsv += `\n${text}\t${annotations[index]}\t${classes[index]}`;
         })
 
         const data = new FormData();
