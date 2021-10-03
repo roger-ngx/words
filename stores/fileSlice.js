@@ -18,16 +18,16 @@ export const filesSlice = createSlice({
         },
         addProject:  (state, action) => {
             const { name } = action.payload;
-            delete(state.projects[`${name}`]);
+            set(state.projects, `${name}`, []);
             state.projects = {...state.projects};
         },
         deleteProject:  (state, action) => {
             const { name } = action.payload;
-            delete(state.projects, `${name}`);
+            delete state.projects[`${name}`];
             state.projects = {...state.projects};
         },
         setFiles: (state, action) => {
-            const { project, files } = action.payload;
+            const { project, files=[] } = action.payload;
             const obj = set({}, `${project}`, [...files]);
             // console.log('setFiles', obj);
             state.projects = {...state.projects, ...obj};

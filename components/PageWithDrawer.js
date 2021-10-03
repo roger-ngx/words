@@ -77,7 +77,7 @@ function PageWithDrawer({window}) {
   const [currentSelectedProject, setCurrentSelectedProject] = useState();
 
   const userProjects = useSelector(state => get(state, 'files.projects', []));
-  const currentUser = useSelector(state => state.user.userInfo);
+  const currentUser = useSelector(state => state.user.userInfo) ?? {};
   const currentSelectedFile = useSelector(state => state.files.selectedFileName);
   // const currentSelectedProject = useSelector(state => state.files.selectedProject);
   const userFiles = get(userProjects, `${currentSelectedProject}`, []);
@@ -89,6 +89,7 @@ function PageWithDrawer({window}) {
 
   const dispatch = useDispatch();
   const router = useRouter();
+
 
   useEffect(() => {
     if(currentUser.uid){
