@@ -20,6 +20,7 @@ const SearchInput = ({onClick}) => {
             }}
         >
             <InputBase
+                placeholder='project name search'
                 value={searchValue}
                 onChange={e => setSearchValue(trim(e.target.value))}
                 onKeyDown={e => e.key==='Enter' && onSearch()}

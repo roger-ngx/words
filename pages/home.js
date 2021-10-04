@@ -9,6 +9,8 @@ import Annotation from 'components/annotation';
 import Classification from 'components/classification';
 import PageWithDrawer from 'components/PageWithDrawer';
 import { useRouter } from 'next/router';
+import QnA from 'components/QnA';
+import MER from 'components/MER';
 
 const Home = () => {
 
@@ -34,6 +36,14 @@ const Home = () => {
 
             case 1:
                 setCurrentComponent(<Annotation />);
+                break;
+
+            case 2:
+                setCurrentComponent(<QnA />);
+                break;
+
+            case 3:
+                setCurrentComponent(<MER />);
                 break;
         }
     }, [currentTab]);

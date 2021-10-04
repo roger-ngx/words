@@ -226,6 +226,9 @@ function PageWithDrawer({window}) {
   }
 
   const requestToDeleteProject = (projectName) => {
+    const ret = confirm(`do you wanna delete a project [${projectName}]`);
+    if(!ret) return ;
+
     setOpenProjectInput(false);
 
     const { uid, username } = currentUser;
@@ -252,6 +255,9 @@ function PageWithDrawer({window}) {
   }
 
   const requestToDeleteFile = ({projectName, fileName}) => {
+    const ret = confirm(`do you wanna delete a file [${fileName}]`);
+    if(!ret) return ;
+
     setOpenProjectInput(false);
 
     const { uid, username } = currentUser;
