@@ -74,12 +74,16 @@ function PageWithDrawer({window}) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [ projectNames, setProjectNames ] = useState([]);
   const [ projectSearchText, setProjectSearchText ] = useState([]);
-  const [currentSelectedProject, setCurrentSelectedProject] = useState();
-
+  
   const userProjects = useSelector(state => get(state, 'files.projects', []));
   const currentUser = useSelector(state => state.user.userInfo) ?? {};
-  const currentSelectedFile = useSelector(state => state.files.selectedFileName);
-  // const currentSelectedProject = useSelector(state => state.files.selectedProject);
+
+  const selectedFile = useSelector(state => state.files.selectedFileName);
+  const selectedProject = useSelector(state => state.files.selectedProject);
+
+  const [currentSelectedProject, setCurrentSelectedProject] = useState(selectedProject);
+  const [currentSelectedFile, setCurrentSelectedFile] = useState(selectedFile);
+
   const userFiles = get(userProjects, `${currentSelectedProject}`, []);
 
   const [ openFileInput, setOpenFileInput ] = useState(false);
@@ -132,6 +136,7 @@ function PageWithDrawer({window}) {
   useEffect(() => {
     if(!isEmpty(currentSelectedProject)){
       getUserFiles(currentUser.username);
+      setCurrentSelectedFile('');
     }
   }, [currentSelectedProject]);
 
@@ -316,16 +321,87 @@ function PageWithDrawer({window}) {
     .then(({files}) => dispatch(setFiles({project: currentSelectedProject, files})));
   };
 
+  const logOut = () => {
+    localStorage.setItem('currentUser', '');
+    router.push('/');
+  }
+
+  const renderProjectListItem = project => (
+    <div key={project}>
+      <ListItem
+      button
+      selected={currentSelectedProject===project}
+      onClick={
+        () => {
+          setCurrentSelectedProject(currentSelectedProject===project ? '' : project);
+          dispatch(setSelectedProject(currentSelectedProject===project ? '' : project));
+        }
+      }
+    >
+      <ListItemText primary={project} />
+      { currentSelectedProject===project ? <ExpandLess /> : <ExpandMore /> }
+    </ListItem>
+    <Collapse in={currentSelectedProject===project} timeout="auto" unmountOnExit>
+      <List component="div" disablePadding>
+        {
+          map(userFiles, file => (
+            <ListItem
+              key={file}
+              button
+              className={classes.nested}
+              selected={currentSelectedFile===file}
+              onClick={
+                () => {
+                  setCurrentSelectedFile(file);
+                  dispatch(setSelectedFileName(currentSelectedFile===file ? '' : file));
+                }
+              }
+            >
+              <ListItemText primary={file} />
+              <ListItemSecondaryAction>
+                <IconButton
+                  edge="end" aria-label="delete"
+                  onClick={throttle(() => requestToDeleteFile({projectName: project, fileName: file}), 2000, {trailing: false})}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))
+        }
+        <label htmlFor='tsv_file_upload'>
+          <ListItem
+            button
+            className={classes.nested}
+          >
+            <ListItemIcon>
+              <AddCircleOutlineIcon />
+            </ListItemIcon>
+            <ListItemText primary='Add File' />
+          </ListItem>
+        </label>
+        <ListItem
+            button
+            className={classes.nested}
+            onClick={throttle(() => requestToDeleteProject(project), 2000, {trailing: false})}
+          >
+            <ListItemIcon>
+              <DeleteIcon />
+            </ListItemIcon>
+            <ListItemText primary='Delete project' />
+          </ListItem>
+        </List>
+      </Collapse>
+    </div>
+  )
+
   const drawer = (
     <div style={{flex: 1, display: 'flex', flexDirection: 'column', width: '100%'}}>
       <div style={{padding: 16, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
         <div>Welcome <b>{currentUser.username}</b></div>
         <div
           style={{fontSize: 12, border: 'solid 1px #ddd', padding: '4px 8px', borderRadius: 20, cursor: 'pointer'}}
-          onClick={() => {
-            localStorage.setItem('currentUser', '');
-            router.push('/');
-          }}
+          onClick={logOut}
         >
           Logout
         </div>
@@ -339,70 +415,7 @@ function PageWithDrawer({window}) {
         </div>
         <List>
           {
-            map(projectNames, project => (
-              <>
-                <ListItem
-                button
-                onClick={
-                  () => {
-                    setCurrentSelectedProject(currentSelectedProject===project ? '' : project);
-                    dispatch(setSelectedProject(currentSelectedProject===project ? '' : project));
-                  }
-                }
-              >
-                <ListItemText button primary={project} />
-                { currentSelectedProject===project ? <ExpandLess /> : <ExpandMore /> }
-              </ListItem>
-              <Collapse in={currentSelectedProject===project} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                  {
-                    map(userFiles, file => (
-                      <ListItem
-                        key={file}
-                        button
-                        className={classes.nested}
-                        selected={currentSelectedFile===file}
-                        onClick={
-                          () => dispatch(setSelectedFileName(currentSelectedFile===file ? '' : file))
-                        }
-                      >
-                        <ListItemText primary={file} />
-                        <ListItemSecondaryAction>
-                          <IconButton
-                            edge="end" aria-label="delete"
-                            onClick={throttle(() => requestToDeleteFile({projectName: project, fileName: file}), 2000, {trailing: false})}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                    ))
-                  }
-                  <label htmlFor='tsv_file_upload'>
-                    <ListItem
-                      button
-                      className={classes.nested}
-                    >
-                      <ListItemIcon>
-                        <AddCircleOutlineIcon />
-                      </ListItemIcon>
-                      <ListItemText primary='Add File' />
-                    </ListItem>
-                  </label>
-                  <ListItem
-                      button
-                      className={classes.nested}
-                      onClick={throttle(() => requestToDeleteProject(project), 2000, {trailing: false})}
-                    >
-                      <ListItemIcon>
-                        <DeleteIcon />
-                      </ListItemIcon>
-                      <ListItemText primary='Delete project' />
-                    </ListItem>
-                  </List>
-                </Collapse>
-              </>
-            ))
+            map(projectNames, renderProjectListItem)
           }
             
           <input
@@ -419,7 +432,6 @@ function PageWithDrawer({window}) {
       <div style={{marginBottom: 10, textAlign: 'center'}}>
         <label htmlFor='tsv_file_upload'>
           <Button
-            button
             variant='outlined'
             onClick={() => setOpenProjectInput(true)}
           >

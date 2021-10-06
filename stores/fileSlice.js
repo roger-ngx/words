@@ -14,7 +14,7 @@ export const filesSlice = createSlice({
             const { names } = action.payload;
             const projects = {};
             forEach(names, name => set(projects, `${name}`, []));
-            state.projects = {...projects};
+            state.projects = {...projects, ...state.projects};
         },
         addProject:  (state, action) => {
             const { name } = action.payload;

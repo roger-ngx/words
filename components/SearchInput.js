@@ -25,8 +25,8 @@ const SearchInput = ({onClick}) => {
                 onChange={e => setSearchValue(trim(e.target.value))}
                 onKeyDown={e => e.key==='Enter' && onSearch()}
             />
-            <IconButton>
-                <Search onClick={onSearch}/>
+            <IconButton onClick={onSearch}>
+                <Search />
             </IconButton>
         </Paper>
     )
