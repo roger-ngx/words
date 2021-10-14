@@ -10,6 +10,12 @@ export const filesSlice = createSlice({
         selectedProject: null
     },
     reducers: {
+        initProjects: (state, action) => {
+            const { names } = action.payload;
+            const projects = {};
+            forEach(names, name => set(projects, `${name}`, []));
+            state.projects = {...projects };
+        },
         setProjects:  (state, action) => {
             const { names } = action.payload;
             const projects = {};
@@ -64,7 +70,7 @@ export const filesSlice = createSlice({
 export const { 
     setFiles, addFile,
     setSelectedProject, setSelectedFileName,
-    setSelectedType, setProjects, addProject,
+    setSelectedType, setProjects, addProject, initProjects,
     deleteProject, deleteFile
 } = filesSlice.actions;
 

@@ -22,7 +22,7 @@ import { get, map, keys, isEmpty, includes, trim, filter, throttle, size, findIn
 import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
-import { setFiles, addFile, setSelectedFileName, setSelectedProject, setProjects, addProject, deleteProject, deleteFile } from 'stores/fileSlice';
+import { setFiles, addFile, setSelectedFileName, setSelectedProject, initProjects, addProject, deleteProject, deleteFile } from 'stores/fileSlice';
 import { ListItemIcon, Button } from '@material-ui/core';
 import FilenameInputDialog from '../dialogs/FilenameInputDialog';
 import { API_SERVER_ADDRESS } from 'constants/defaults';
@@ -74,15 +74,12 @@ function PageWithDrawer({window}) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [ projectNames, setProjectNames ] = useState([]);
   const [ projectSearchText, setProjectSearchText ] = useState([]);
-  
+
   const userProjects = useSelector(state => get(state, 'files.projects', []));
   const currentUser = useSelector(state => state.user.userInfo) ?? {};
 
-  const selectedFile = useSelector(state => state.files.selectedFileName);
-  const selectedProject = useSelector(state => state.files.selectedProject);
-
-  const [currentSelectedProject, setCurrentSelectedProject] = useState(selectedProject);
-  const [currentSelectedFile, setCurrentSelectedFile] = useState(selectedFile);
+  const [currentSelectedProject, setCurrentSelectedProject] = useState();
+  const [currentSelectedFile, setCurrentSelectedFile] = useState();
 
   const userFiles = get(userProjects, `${currentSelectedProject}`, []);
 
@@ -117,6 +114,11 @@ function PageWithDrawer({window}) {
   }, [userProjects]);
 
   useEffect(() => {
+    dispatch(setSelectedFileName());
+    dispatch(setSelectedProject());
+  }, []);
+
+  useEffect(() => {
     const names = filter(projectNames, name => includes(name, projectSearchText));
     setProjectNames(names)
   }, [projectSearchText]);
@@ -136,7 +138,6 @@ function PageWithDrawer({window}) {
   useEffect(() => {
     if(!isEmpty(currentSelectedProject)){
       getUserFiles(currentUser.username);
-      setCurrentSelectedFile('');
     }
   }, [currentSelectedProject]);
 
@@ -227,7 +228,7 @@ function PageWithDrawer({window}) {
         },
     })
     .then(res => res.json())
-    .then(res => res.names && dispatch(setProjects({names: res.names})))
+    .then(res => res.names && dispatch(initProjects({names: res.names})))
   }
 
   const requestToDeleteProject = (projectName) => {
@@ -326,17 +327,17 @@ function PageWithDrawer({window}) {
     router.push('/');
   }
 
+  const onClickProjectListItem = (project) => {
+    setCurrentSelectedProject(currentSelectedProject===project ? '' : project);
+    dispatch(setSelectedProject(currentSelectedProject===project ? '' : project));
+  }
+
   const renderProjectListItem = project => (
     <div key={project}>
       <ListItem
       button
       selected={currentSelectedProject===project}
-      onClick={
-        () => {
-          setCurrentSelectedProject(currentSelectedProject===project ? '' : project);
-          dispatch(setSelectedProject(currentSelectedProject===project ? '' : project));
-        }
-      }
+      onClick={() => onClickProjectListItem(project)}
     >
       <ListItemText primary={project} />
       { currentSelectedProject===project ? <ExpandLess /> : <ExpandMore /> }
@@ -344,30 +345,7 @@ function PageWithDrawer({window}) {
     <Collapse in={currentSelectedProject===project} timeout="auto" unmountOnExit>
       <List component="div" disablePadding>
         {
-          map(userFiles, file => (
-            <ListItem
-              key={file}
-              button
-              className={classes.nested}
-              selected={currentSelectedFile===file}
-              onClick={
-                () => {
-                  setCurrentSelectedFile(file);
-                  dispatch(setSelectedFileName(currentSelectedFile===file ? '' : file));
-                }
-              }
-            >
-              <ListItemText primary={file} />
-              <ListItemSecondaryAction>
-                <IconButton
-                  edge="end" aria-label="delete"
-                  onClick={throttle(() => requestToDeleteFile({projectName: project, fileName: file}), 2000, {trailing: false})}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))
+          map(userFiles, renderFileListItem)
         }
         <label htmlFor='tsv_file_upload'>
           <ListItem
@@ -393,6 +371,31 @@ function PageWithDrawer({window}) {
         </List>
       </Collapse>
     </div>
+  )
+
+  const onClickFileListItem = (file) => {
+    setCurrentSelectedFile(file);
+    dispatch(setSelectedFileName(currentSelectedFile===file ? '' : file));
+  }
+
+  const renderFileListItem = file => (
+    <ListItem
+      key={file}
+      button
+      className={classes.nested}
+      selected={currentSelectedFile===file}
+      onClick={() => onClickFileListItem(file)}
+    >
+      <ListItemText primary={file} />
+      <ListItemSecondaryAction>
+        <IconButton
+          edge="end" aria-label="delete"
+          onClick={throttle(() => requestToDeleteFile({projectName: project, fileName: file}), 2000, {trailing: false})}
+        >
+          <DeleteIcon />
+        </IconButton>
+      </ListItemSecondaryAction>
+    </ListItem>
   )
 
   const drawer = (

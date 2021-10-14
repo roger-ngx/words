@@ -316,7 +316,7 @@ const Classification = () => {
 
     // const classes = useStyles();
 
-    return (<>
+    return !selectedFileName || (<>
         <div
             tabIndex="0"
             style={{display: 'flex', justifyContent: 'center', marginBottom: 200}}

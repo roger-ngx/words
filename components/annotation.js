@@ -548,7 +548,7 @@ const Annotation = () => {
         window.location.href = "data:text/tab-separated-values," + encodeURIComponent(tsv);
     }
 
-    return (<div
+    return !selectedFileName || (<div
         style={{outline: 'none', position: 'relative'}}
         tabIndex="0"
         onKeyDown={e => {
